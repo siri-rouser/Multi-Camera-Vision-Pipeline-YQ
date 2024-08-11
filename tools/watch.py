@@ -77,7 +77,8 @@ def handle_sae_message(sae_message_bytes, stream_key):
 
     log_line = f'E2E-Delay: {round(time.time() * 1000 - sae_msg.frame.timestamp_utc_ms): >8} ms, Display Frametime: {frametime: >5} ms'
     if sae_msg.HasField('metrics'):
-        log_line += f', Detection: {sae_msg.metrics.detection_inference_time_us: >7} us, Tracking: {sae_msg.metrics.tracking_inference_time_us: >7} us'
+        log_line += f', Detection: {sae_msg.metrics.detection_inference_time_us: >7} us, Tracking: {sae_msg.metrics.tracking_inference_time_us: >7} us, Feature Extracting: {sae_msg.metrics.feature_extraction_time_us: >7} us'
+
     print(log_line)
 
     image = get_image(sae_msg)
@@ -95,9 +96,10 @@ if __name__ == '__main__':
     arg_parser.add_argument('-i', '--image-file', type=str, default=None)
     args = arg_parser.parse_args()
 
-    STREAM_KEY = args.stream
+    STREAM_KEY = args.stream # seems to be None ..... at first
     REDIS_HOST = args.redis_host
     REDIS_PORT = args.redis_port
+
 
     if STREAM_KEY is None:
         redis_client = redis.Redis(REDIS_HOST, REDIS_PORT)

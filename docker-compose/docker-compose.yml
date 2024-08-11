@@ -45,13 +45,13 @@ services:
               capabilities: [gpu]
                   
 
-  object-tracker-stream1:
-    image: ${IMAGE_REGISTRY}/sae-object-tracker:${OBJECT_TRACKER_VERSION}
-    volumes:
-      - ./object-tracker/object-tracker-stream1.settings.yaml:/code/settings.yaml
-    depends_on:
-      redis:
-        condition: service_healthy
+  # object-tracker-stream1:
+  #   image: mcvt_yq/object-tracker:latest
+  #   volumes:
+  #     - ./object-tracker/object-tracker-stream1.settings.yaml:/code/settings.yaml
+  #   depends_on:
+  #     redis:
+  #       condition: service_healthy
 
   object-tracker-stream2:
     image: ${IMAGE_REGISTRY}/sae-object-tracker:${OBJECT_TRACKER_VERSION}
