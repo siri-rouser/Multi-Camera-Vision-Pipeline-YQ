@@ -7,11 +7,12 @@ tracker_config:
     n_init: 1 # change in DeepSort, it is meaningless to setup this value in here. 
     multi_camera_tracking: TRUE
 
+
 log_level: DEBUG
 
 redis:
   host: "localhost"  # Updated to point to localhost
   port: 6379
-  stream_id: stream2
+  stream_id: stream1
   input_stream_prefix: "featureextractor"
   output_stream_prefix: "objecttracker"

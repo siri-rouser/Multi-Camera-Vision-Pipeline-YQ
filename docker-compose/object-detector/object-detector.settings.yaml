@@ -8,6 +8,6 @@ log_level: DEBUG
 redis:
   host: redis
   port: 6379
-  stream_ids:
+  stream_ids: 
     - stream1
     - stream2 

@@ -1,7 +1,7 @@
 backbone: 'resnet101_ibn_a'
 reid_config:
   reid_size_test: [384, 384]
-  reid_model_path: 'feature_extractor/reid_model/resnet101_ibn_a_3.pth'
+  reid_model_path: 'feature_extractor/reid_model/resnet101_ibn_a_3.pth'  # only one model is used 
 
 log_level: DEBUG
 

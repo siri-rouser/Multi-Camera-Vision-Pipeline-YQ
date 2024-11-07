@@ -4,6 +4,7 @@ reid_config:
   reid_model_path: 'feature_extractor/reid_model/resnet101_ibn_a_3.pth'
 
 log_level: DEBUG
+
 redis:
   host: redis
   port: 6379
