@@ -6,6 +6,9 @@ import matplotlib.pyplot as plt
 import cv2
 
 ######################### Helper Functions ################################################
+# class camera_fitting():
+#     def __init__(self):
+#         pass
 
 def gps_distance_m(lat1, lon1, lat2, lon2):
     """Calculate the approximate distance between two GPS coordinates in meters."""

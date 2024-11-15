@@ -27,7 +27,7 @@ Cam_pre_setting_parameters:
 
   # SPATIAL ORIENTATION PARAMETERS
   SpatialOrientation_parameters:
-    heading_deg: 325               # Camera heading in degrees.
+    heading_deg: 325               # Camera heading in degrees, north is the reference. Set to `null` if unknown.
     tilt_deg: null                 # Camera tilt angle in degrees. Set to `null` if unknown.
     roll_deg: null                 # Camera roll angle in degrees. Set to `null` if unknown.
     pos_x_m: 0                     # X position of the camera in meters; set to 0 for origin.

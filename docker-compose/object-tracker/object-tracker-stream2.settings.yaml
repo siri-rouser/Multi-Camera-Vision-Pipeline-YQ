@@ -10,8 +10,8 @@ tracker_config:
 log_level: DEBUG
 
 redis:
-  host: "localhost"  # Updated to point to localhost
+  host: redis  # Updated to point to localhost
   port: 6379
   stream_id: stream2
-  input_stream_prefix: "featureextractor"
-  output_stream_prefix: "objecttracker"
+  input_stream_prefix: featureextractor
+  output_stream_prefix: objecttracker

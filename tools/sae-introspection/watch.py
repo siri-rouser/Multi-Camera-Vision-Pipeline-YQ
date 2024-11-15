@@ -6,7 +6,7 @@ import cv2
 import numpy as np
 import redis
 from common import choose_stream, default_arg_parser, register_stop_handler
-from visionapi.messages_pb2 import Detection, SaeMessage
+from visionapi_yq.messages_pb2 import Detection, SaeMessage
 from visionlib.pipeline.consumer import RedisConsumer
 from visionlib.pipeline.tools import get_raw_frame_data
 
@@ -50,7 +50,7 @@ def annotate(image, detection: Detection):
     label = f'{class_id} - {round(conf,2)}'
 
     if detection.object_id is not None:
-        object_id = detection.object_id.hex()[:4]
+        object_id = detection.object_id
         label = f'ID {object_id} - {class_id} - {round(conf,2)}'
 
     line_width = max(round(sum(image.shape) / 2 * 0.002), 2)
@@ -79,7 +79,7 @@ def handle_sae_message(sae_message_bytes, stream_key):
 
     log_line = f'E2E-Delay: {round(time.time() * 1000 - sae_msg.frame.timestamp_utc_ms): >8} ms, Display Frametime: {frametime: >5} ms'
     if sae_msg.HasField('metrics'):
-        log_line += f', Detection: {sae_msg.metrics.detection_inference_time_us: >7} us, Tracking: {sae_msg.metrics.tracking_inference_time_us: >7} us'
+        log_line += f', Detection: {sae_msg.metrics.detection_inference_time_us: >7} us, Feature_extraction: {sae_msg.metrics.feature_extraction_time_us: >7} us, Tracking: {sae_msg.metrics.tracking_inference_time_us: >7} us'
     print(log_line, file=sys.stderr)
 
     image = get_image(sae_msg)
@@ -91,6 +91,9 @@ def handle_sae_message(sae_message_bytes, stream_key):
         sys.stdout.buffer.write(image)
     
     showImage(stream_key, image)
+
+    return image
+    
 
 
 if __name__ == '__main__':
@@ -117,6 +120,8 @@ if __name__ == '__main__':
 
     consume = RedisConsumer(REDIS_HOST, REDIS_PORT, [STREAM_KEY], block=200)
 
+    video_writer = cv2.VideoWriter('record.mp4', cv2.VideoWriter_fourcc(*'mp4v') , 10.0, (640*2, 480*2))
+
     with consume:
         for stream_key, proto_data in consume():
             if stop_event.is_set():
@@ -125,4 +130,6 @@ if __name__ == '__main__':
             if stream_key is None:
                 continue
             
-            handle_sae_message(proto_data, stream_key)
+            image = handle_sae_message(proto_data, stream_key)
+
+            video_writer.write(image)

@@ -1,3 +1,14 @@
+# tracker_algorithm: OCSORT
+# tracker_config:
+#   det_thresh: 0.2
+#   max_age: 30
+#   min_hits: 3
+#   asso_threshold: 0.3
+#   delta_t: 3
+#   asso_func: 'iou'
+#   inertia: 0.2
+#   use_byte: False
+
 tracker_algorithm: DEEPSORT
 tracker_config:
     max_cosine_distance: 0.2
@@ -7,12 +18,31 @@ tracker_config:
     n_init: 1 # change in DeepSort, it is meaningless to setup this value in here. 
     multi_camera_tracking: TRUE
 
+# tracker_algorithm: DEEPOCSORT
+# tracker_config:
+#   model_weights: 'osnet_x0_25_msmt17.pt'
+#   device: 'cpu'
+#   fp16: False
+#   det_thresh: 0.3
+#   max_age: 30
+#   min_hits: 3
+#   iou_threshold: 0.3
+#   delta_t: 3
+#   asso_func: 'iou'
+#   inertia: 0.2
+#   w_association_emb: 0.5
+#   alpha_fixed_emb: 0.95
+#   aw_param: 0.5
+#   embedding_off: False
+#   cmc_off: False
+#   aw_off: False
+#   new_kf_off: False
 
 log_level: DEBUG
 
 redis:
-  host: "localhost"  # Updated to point to localhost
+  host: redis # Updated to point to localhost
   port: 6379
   stream_id: stream1
-  input_stream_prefix: "featureextractor"
-  output_stream_prefix: "objecttracker"
+  input_stream_prefix: featureextractor
+  output_stream_prefix: objecttracker
