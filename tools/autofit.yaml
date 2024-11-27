@@ -48,7 +48,7 @@ Iteration_num: 10000               # Number of iterations for the Metropolis opt
 
 # TOP VIEW SETTINGS
 TOPVIEW:
-  do_plot: true                    # Set to `true` to generate a top-view image; `false` to disable.
+  do_plot: TRUE                    # Set to `true` to generate a top-view image; `false` to disable.
   extent: [-80, 20, -20, 80]       # Extent of the top view in meters: [x_min, x_max, y_min, y_max].
                                    # Leave as `null` to auto-calculate an appropriate extent.
   scaling: 0.05                    # Scaling factor for top view; represents meters per pixel. 

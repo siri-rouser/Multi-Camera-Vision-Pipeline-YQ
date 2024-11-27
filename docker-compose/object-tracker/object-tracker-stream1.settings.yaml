@@ -12,10 +12,10 @@
 tracker_algorithm: DEEPSORT
 tracker_config:
     max_cosine_distance: 0.2
-    min_confidence: 0.2
+    min_confidence: 0.5
     max_iou_distance: 0.7
     max_age: 30
-    n_init: 1 # change in DeepSort, it is meaningless to setup this value in here. 
+    n_init: 3 # change in DeepSort, it is meaningless to setup this value in here. 
     multi_camera_tracking: TRUE
 
 # tracker_algorithm: DEEPOCSORT

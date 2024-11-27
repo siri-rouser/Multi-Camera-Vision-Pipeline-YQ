@@ -120,7 +120,7 @@ if __name__ == '__main__':
 
     consume = RedisConsumer(REDIS_HOST, REDIS_PORT, [STREAM_KEY], block=200)
 
-    video_writer = cv2.VideoWriter('record.mp4', cv2.VideoWriter_fourcc(*'mp4v') , 10.0, (640*2, 480*2))
+    video_writer = cv2.VideoWriter('record.mp4', cv2.VideoWriter_fourcc(*'mp4v') , 10.0, (2560, 1440))
 
     with consume:
         for stream_key, proto_data in consume():
