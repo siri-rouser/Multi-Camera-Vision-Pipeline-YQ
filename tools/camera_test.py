@@ -1,5 +1,6 @@
 from CameraFit import Camerafit
 import numpy as np
+import cv2
 
 # NOTE: Define landmark points in pixel and GPS space
 lm_points_px = np.array([
@@ -27,5 +28,6 @@ camera = Camerafit(fitconfig='autofit.yaml',px_location=lm_points_px,gps_locatio
 camera.show_perf()
 
 topview_im = camera.topview()
+cv2.imwrite('topview1.jpg',topview_im)
 
 camera.save_cam()

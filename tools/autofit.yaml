@@ -38,7 +38,7 @@ Cam_pre_setting_parameters:
   BrownLensDistortion_parameters:
     k1: null                       # Distortion coefficient k1. Set to `null` if unknown.
     k2: null                       # Distortion coefficient k2. Set to `null` if unknown.
-    k3: null                       # Distortion coefficient k3. Optional; set only if needed.
+    k3: 0                     # Distortion coefficient k3. Optional; set only if needed.
 
   # GPS LOCATION OF THE CAMERA
   GPS: [39.97095, -86.070464]      # Mandatory GPS coordinates of the camera (latitude, longitude).
