@@ -1,0 +1,192 @@
+nameOverride: ""
+fullnameOverride: ""
+
+# extraImagePullSecrets:
+#   - name: extra-pull-secret
+
+videoSource:
+  image: 
+    repository: starwitorg/sae-video-source-py
+    tag: 1.0.1
+  configs: 
+  - id: stream1
+    uri: 'uri'
+
+objectDetector:
+  image:
+    repository: starwitorg/sae-object-detector
+    tag: 3.0.0
+  customWeights: 
+    enabled: false
+    imageTag: weights-image-tag
+  logLevel: INFO
+  config:
+    model:
+      weights_path: yolov8n.pt
+      device: cpu
+      nms_agnostic: false
+    inference_size: [ 640, 640 ]
+    classes: null
+    redis:
+      stream_ids:
+        - stream1
+
+objectTracker:
+  image:
+    repository: starwitorg/sae-object-tracker
+    tag: 3.1.0
+  logLevel: INFO
+  needsGpu: False
+  streamIds:
+    - stream1
+  config:
+    tracker_algorithm: OCSORT
+    tracker_config:
+      det_thresh: 0.2
+      max_age: 30
+      min_hits: 3
+      asso_threshold: 0.3
+      delta_t: 3
+      asso_func: 'iou'
+      inertia: 0.2
+      use_byte: False
+      Q_xy_scaling: 1
+      Q_s_scaling: 1
+
+geoMapper:
+  image:
+    repository: starwitorg/sae-geo-mapper
+    tag: 0.4.0
+  enabled: false
+  config:
+    cameras:                  
+      - stream_id: stream1    
+        passthrough: false    
+        view_x_deg: 90        
+        image_width_px: 1920
+        image_height_px: 1080
+        elevation_m: 10       
+        tilt_deg: 45          
+        pos_lat: 52           
+        pos_lon: 10           
+        heading_deg: 90       
+        brown_distortion_k1: 0
+        brown_distortion_k2: 0
+        brown_distortion_k3: 0
+
+geoMerger:
+  image:
+    repository: starwitorg/sae-geo-merger
+    tag: 0.1.0
+  enabled: false
+  config:
+    merging_config:
+      max_distance_m: 2
+      merging_window_ms: 1000
+      target_mps: 10
+      input_stream_ids: 
+        - stream1
+        - stream2
+      output_stream_id: merged
+
+redisWriter:
+  image:
+    repository: starwitorg/sae-redis-writer
+    tag: 1.2.2
+  enabled: false
+  configs:
+    - name: output1
+      redis:
+        input_stream_prefix: objecttracker
+      target_redis:
+        output_stream_prefix: saeoutput
+        host: host
+        port: 6379
+        buffer_length: 10
+        target_stream_maxlen: 100
+        tls: false
+      stream_ids:
+        - stream1
+
+databaseWriter:
+  image:
+    repository: starwitorg/sae-database-writer
+    tag: 2.0.0
+  enabled: true
+  config:
+    redisStreamIds:
+      - stream1
+    db:
+      jdbcUrl: jdbc:postgresql://host:port/
+      schema: schema
+      username: username
+      password: password
+      hypertable: tablename
+
+redis:
+  architecture: standalone
+  auth:
+    enabled: false
+  commonConfiguration: |-
+    save ""
+    appendonly no
+  master:
+    persistence:
+      enabled: false
+    resources:
+      limits:
+        memory: 512Mi
+        cpu: 500m
+      requests:
+        memory: 256Mi
+        cpu: 250m
+  metrics:
+    enabled: true
+
+prometheus:
+  alertmanager:
+    enabled: false
+  server:
+    service:
+      type: ClusterIP
+    scrapeInterval: 10s
+    evaluationInterval: 10s
+    extraScrapeConfigs:
+      - job_name: redis_exporter
+        static_configs:
+          - targets: ['{{ include "sae.redisMetricsServiceName" $ }}:9121']
+      - job_name: node_exporter
+        static_configs:
+          - targets: ['{{ include "sae.nodeExporterServiceName" $ }}:9100']
+      - job_name: sae_pods
+        kubernetes_sd_configs:
+          - role: pod
+            namespaces:
+              own_namespace: true
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_pod_annotation_sae_starwit_de_stage]
+            action: keep
+            regex: (video-source|object-detector|object-tracker|geo-mapper|geo-merger|redis-writer)
+          - source_labels: [__meta_kubernetes_pod_name]
+            action: replace
+            target_label: pod
+          - source_labels: [__meta_kubernetes_pod_annotation_sae_starwit_de_stage]
+            action: replace
+            target_label: stage
+          
+
+grafana:
+  admin:
+    password: admin
+  datasources:
+    secretDefinition: 
+      apiVersion: 1
+      datasources:
+        - name: Prometheus
+          type: prometheus
+          access: proxy
+          url: http://{{ include "sae.prometheusServiceName" . }}
+
+
+nodeexporter:
+  enabled: true
