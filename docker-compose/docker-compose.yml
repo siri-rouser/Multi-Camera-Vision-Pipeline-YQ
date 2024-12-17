@@ -30,9 +30,10 @@ services:
         condition: service_healthy
 
   object-detector:
-    image: ${IMAGE_REGISTRY}/sae-object-detector:${OBJECT_DETECTOR_VERSION}
+    image: mcvt_yq/object_detector:latest
     volumes:
       - ./object-detector/object-detector.settings.yaml:/code/settings.yaml
+      - ./object-detector/weights/yolo11l.engine:/code/yolo11l.engine
     depends_on:
       redis:
         condition: service_healthy
@@ -55,50 +56,50 @@ services:
     ports:
       - 8554:8554
 
-  feature-extractor1:
-    image: mcvt_yq/feature_extractor:latest
-    volumes:
-      - ./feature-extractor/feature-extractor1.settings.yaml:/code/settings.yaml
-    depends_on:
-      redis:
-        condition: service_healthy
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
+  # feature-extractor1:
+  #   image: mcvt_yq/feature_extractor:latest
+  #   volumes:
+  #     - ./feature-extractor/feature-extractor1.settings.yaml:/code/settings.yaml
+  #   depends_on:
+  #     redis:
+  #       condition: service_healthy
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #           - driver: nvidia
+  #             count: all
+  #             capabilities: [gpu]
 
-  feature-extractor2:
-    image: mcvt_yq/feature_extractor:latest
-    volumes:
-      - ./feature-extractor/feature-extractor2.settings.yaml:/code/settings.yaml
-    depends_on:
-      redis:
-        condition: service_healthy
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
+  # feature-extractor2:
+  #   image: mcvt_yq/feature_extractor:latest
+  #   volumes:
+  #     - ./feature-extractor/feature-extractor2.settings.yaml:/code/settings.yaml
+  #   depends_on:
+  #     redis:
+  #       condition: service_healthy
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #           - driver: nvidia
+  #             count: all
+  #             capabilities: [gpu]
 
 
-  object-tracker-stream1:
-    image: mcvt_yq/object_tracker:latest
-    volumes:
-      - ./object-tracker/object-tracker-stream1.settings.yaml:/code/settings.yaml
-    depends_on:
-      redis:
-        condition: service_healthy
+  # object-tracker-stream1:
+  #   image: mcvt_yq/object_tracker:latest
+  #   volumes:
+  #     - ./object-tracker/object-tracker-stream1.settings.yaml:/code/settings.yaml
+  #   depends_on:
+  #     redis:
+  #       condition: service_healthy
 
   
-  object-tracker-stream2:
-    image: mcvt_yq/object_tracker:latest
-    volumes:
-      - ./object-tracker/object-tracker-stream2.settings.yaml:/code/settings.yaml
-    depends_on:
-      redis:
-        condition: service_healthy
+  # object-tracker-stream2:
+  #   image: mcvt_yq/object_tracker:latest
+  #   volumes:
+  #     - ./object-tracker/object-tracker-stream2.settings.yaml:/code/settings.yaml
+  #   depends_on:
+  #     redis:
+  #       condition: service_healthy
