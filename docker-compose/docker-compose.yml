@@ -21,13 +21,13 @@ services:
       redis:
         condition: service_healthy
 
-  video-source-stream2:
-    image: ${IMAGE_REGISTRY}/sae-video-source-py:${VIDEO_SOURCE_VERSION}
-    volumes:
-      - ./video-source-py/video-source-stream2.settings.yaml:/code/settings.yaml
-    depends_on:
-      redis:
-        condition: service_healthy
+  # video-source-stream2:
+  #   image: ${IMAGE_REGISTRY}/sae-video-source-py:${VIDEO_SOURCE_VERSION}
+  #   volumes:
+  #     - ./video-source-py/video-source-stream2.settings.yaml:/code/settings.yaml
+  #   depends_on:
+  #     redis:
+  #       condition: service_healthy
 
   object-detector:
     image: mcvt_yq/object_detector:latest
