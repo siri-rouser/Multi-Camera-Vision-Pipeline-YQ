@@ -60,6 +60,12 @@ geoMapper:
         brown_distortion_k1: 0              # Distortion correction (abc-model is also available)
         brown_distortion_k2: 0
         brown_distortion_k3: 0
+        mapping_area:                       # Must be a geojson `Polygon`. If set, only detections within that polygon will be mapped (i.e. will have coordinates set)
+          type: Polygon
+          coordinates: [[                   # [lon,lat] list of polygon points. The last point must equal the first to close the polygon!
+              [10, 50],
+            ]]
+        remove_unmapped_detections: false   # # If unmapped detections should be removed (i.e. detections filtered by mapping_area, see above)
 
 geoMerger:
   enabled: false

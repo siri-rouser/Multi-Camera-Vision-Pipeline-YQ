@@ -2,4 +2,8 @@ temp
 .venv
 *.jpg
 *.mp4
+*.png
 .python-version
+autofit.*.yaml
+__pycache__
+*.json
