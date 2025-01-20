@@ -29,7 +29,7 @@ if args.lower_angle_x:
     best_view_x = 0
     view_x_deg_grid = np.arange(args.lower_angle_x, args.upper_angle_x, args.step_size)
     for view_x_deg in tqdm(view_x_deg_grid):
-        batch_min = 999
+        batch_min = 999 # batch_min is the distance threshold and to record the ave_distance 
         for _ in range(ITERATIONS):
             config_obj.camera_parameters.rectilinear_projection.view_x_deg = view_x_deg
             cam = Camerafit(fitconfig=config_obj)
@@ -43,6 +43,11 @@ if args.lower_angle_x:
 else:
     best_camera = Camerafit(fitconfig=config_obj)
     best_view_x = config_obj.camera_parameters.rectilinear_projection.view_x_deg
+
+# Print all camera parameters after fitting
+print("All Camera Parameters After Fitting:")
+for attr, value in best_camera.__dict__.items():
+    print(f"{attr}: {value}")
 
 print(f"Best solution: Average Distance {best_camera.get_perf():.2f} meters (view_x_deg={best_view_x})")
 best_camera.plot_fit_information_image_space('info.png')

@@ -25,9 +25,9 @@ class RectilinearProjection(BaseModel):
 
 class SpatialOrientation(BaseModel):
     heading_deg: Union[float, FitConstraint] = FitConstraint(min=0, max=360, init=0)
-    tilt_deg: Union[float, FitConstraint] = FitConstraint(min=0, max=90, init=45)
+    tilt_deg: Union[float, FitConstraint] = FitConstraint(min=0, max=90, init=70)
     roll_deg: Union[float, FitConstraint] = FitConstraint(min=-90, max=90, init=0)
-    elevation_m: Union[float, FitConstraint] = FitConstraint(min=0, max=25, init=10)
+    elevation_m: Union[float, FitConstraint] = FitConstraint(min=0, max=25, init=5)
     pos_x_m: float = 0
     pos_y_m: float = 0
 
@@ -110,7 +110,7 @@ class Camerafit():
         self.img = plt.imread(self._fitconfig.image_path)
         camera = self._initialize_camera()
         space_location = camera.spaceFromGPS(self._fitconfig.gps_locations)
-        camera.addLandmarkInformation(self._fitconfig.px_locations, space_location, [1e-3, 1e-3, 1e-2])
+        camera.addLandmarkInformation(self._fitconfig.px_locations, space_location, [0.5, 0.5, 0.2])
         fit_parameters = self._create_fit_parameters()
         trace = camera.metropolis(fit_parameters, iterations=self._fitconfig.iteration_num, print_trace=False, disable_bar=True)
         return camera
