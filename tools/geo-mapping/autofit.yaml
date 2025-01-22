@@ -21,7 +21,7 @@ camera_parameters:
   # Set one of the following: `focallength_mm`, `view_x_deg`, or `view_y_deg`.
   rectilinear_projection:
     focallength_mm: null           # Focal length in millimeters. Set to `null` if unknown.
-    view_x_deg: null                # Horizontal field of view in degrees. Mandatory if `focallength_mm` is `null`.
+    view_x_deg: 72              # Horizontal field of view in degrees. Mandatory if `focallength_mm` is `null`.
     view_y_deg: null               # Vertical field of view in degrees. Optional; set if known.
     sensor_width_mm: null          # Sensor width in millimeters.
     sensor_height_mm: null         # Sensor height in millimeters.
@@ -43,16 +43,17 @@ camera_parameters:
 
   # GPS LOCATION OF THE CAMERA (mandatory)
   gps_location:
-    lat: 39.975605748738964
-    lon: -86.12710274800055
+    lat: 39.97560282792848 
+    lon: -86.12711046092102
     
 landmarks:
-  - [[1111, 1360], [39.97564026765263, -86.127095023064, 0]]            # Format: [[px_x, px_y], [lat, lon, elev_m]]
+  - [[1107, 1355], [39.975640339428814, -86.1270957087724, 0]]            # Format: [[px_x, px_y], [lat, lon, elev_m]]
   - [[609,753], [39.97570506487, -86.12717756644481, 0.1]]
   - [[1351,447], [39.975887566154995, -86.12710441429941,0]]
   - [[1919,507],[39.97586649380414, -86.12696021596896,0]]
   - [[1291,581],[39.97579248354361, -86.12710374361174,0]]
   - [[477,1173],[39.97564497599324, -86.12714308441622,0]]
+  - [[961,1403],[39.97563681185661, -86.127103812049,0]]
   # - [[189,1069],[39.9756454907049, -86.12717617812069,0.2]]
   # - [[1720,622],[39.97576832602807, -86.12703600158584,0.2]]
   # - [[2491,1000],[39.9756712073519, -86.12697162858345,0.2]]
@@ -60,7 +61,13 @@ landmarks:
   - [[1037,456],[39.97586493071219, -86.12717949977794,0.1]] 
   - [[1503,441], [39.97591024814056, -86.12706490469586,0]]
   - [[1499,418], [39.97593929477572, -86.12706259351656,0]]
-  - [[1579,911], [39.97568814852524, -86.12706311611959, 0]]
+#  - [[1579,911], [39.97568814852524, -86.12706311611959, 0]]
+  - [[1167,940],[39.97566918478008, -86.12710045928795,0]]
+  - [[1196,414], [39.97592142996607, -86.12715180158857,0.1]]
+  - [[1360,287], [39.97647587609698, -86.12715716600687, 0]]
+  - [[695,937],[39.97567779422236, -86.127142762426,0]]
+  - [[1047,577],[39.97577548342932, -86.12714398853173,0]]
+  - [[1527,639],[39.97576212319784, -86.12706620447503,0]]
 # ITERATION SETTINGS FOR METROPOLIS OPTIMIZATION
 iteration_num: 10000               # Number of iterations for the Metropolis optimization.
 

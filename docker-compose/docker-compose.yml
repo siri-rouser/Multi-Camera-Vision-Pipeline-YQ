@@ -57,7 +57,7 @@ services:
       - 8554:8554
 
   feature-extractor1:
-    image: mcvt_yq/feature_extractor:latest
+    image: mcvt_yq/feature_extractor_temp:latest
     volumes:
       - ./feature-extractor/feature-extractor1.settings.yaml:/code/settings.yaml
     depends_on:
@@ -72,7 +72,7 @@ services:
               capabilities: [gpu]
 
   feature-extractor2:
-    image: mcvt_yq/feature_extractor:latest
+    image: mcvt_yq/feature_extractor_temp:latest
     volumes:
       - ./feature-extractor/feature-extractor2.settings.yaml:/code/settings.yaml
     depends_on:
@@ -103,3 +103,14 @@ services:
     depends_on:
       redis:
         condition: service_healthy
+    
+  geo-mapper:
+    image: mcvt_yq/geomapper:latest
+    volumes:
+      - ./geo-mapper/geo-mapper.settings.yaml:/code/settings.yaml
+      - ./geo-mapper/cam_config/fitted_camNB.json:/code/fitted_cam_NB_new.json
+      - ./geo-mapper/cam_config/fitted_camSB.json:/code/fitted_camSB.json
+    depends_on:
+      redis:
+        condition: service_healthy
+    

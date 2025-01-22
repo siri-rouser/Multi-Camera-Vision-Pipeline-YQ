@@ -44,6 +44,10 @@ class Camerafit():
         for attr, value in camera.__dict__.items():
             print(f"{attr}: {value}")
 
+        camera.plotFitInformation(self.img)
+        plt.legend()
+        plt.savefig('fitted.jpg')
+
         return camera
             
     def _create_fit_parameters(spato_params, brownld_params):
@@ -52,7 +56,7 @@ class Camerafit():
 
         # Add missing spatial orientation parameters to fit
         if spato_params['elevation_m'] is None:
-            fit_parameters.append(ct.FitParameter("elevation_m", lower=0, upper=25, value=10))
+            fit_parameters.append(ct.FitParameter("elevation_m", lower=0, upper=25, value=5))
         if spato_params['tilt_deg'] is None:
             fit_parameters.append(ct.FitParameter("tilt_deg", lower=0, upper=180, value=60))
         if spato_params['roll_deg'] is None:
@@ -123,7 +127,7 @@ class Camerafit():
         if spato_params['roll_deg'] is None:
             fit_parameters.append(ct.FitParameter("roll_deg", lower=-180, upper=180, value=0))
         if spato_params['heading_deg'] is None:
-            fit_parameters.append(ct.FitParameter("heading_deg", lower=0, upper=360, value=0))
+            fit_parameters.append(ct.FitParameter("heading_deg", lower=0, upper=360, value=180))
 
         # Add missing lens distortion parameters to fit
         if brownld_params['k1'] is None:
