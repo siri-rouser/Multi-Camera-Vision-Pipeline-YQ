@@ -1,0 +1,98 @@
+# README BEFORE USING THE SCRIPT:
+# This auto-camera-fitting script assists in fitting camera parameters when limited information is available. 
+# The script estimates parameters based on GPS and pixel locations.
+
+# ASSUMPTIONS:
+# - The labeled points in autocameratransform.py have an elevation of 0. If not, please specify the elevation.
+# - At a minimum, provide one of the following: `focallength_mm`, `view_x_deg`, or `view_y_deg`, as well as a sample image frame and the GPS location of the camera.
+
+# STEPS TO USE THE SCRIPT:
+# 1. Fill in the parameters in this .yaml file. For unknown parameters, set them to `null`.
+# 2. Label points in autocameratransform.py with pixel coordinates (e.g., [1920, 1080]) and corresponding GPS coordinates (e.g., [39.97109148165551, -86.07059324551214]).
+# 3. Run the script with `python autocameratransform.py`.
+
+
+# Path to the image file to be used for camera fitting
+image_path: '/home/yuqiang/yl4300/project/Multi-Camera-Vision-Pipeline-YQ/carmel_data/RangelinePhelpsNB.jpg'
+
+# Known parameters of the camera
+camera_parameters:
+  # RECTILINEAR PROJECTION PARAMETERS
+  # Set one of the following: `focallength_mm`, `view_x_deg`, or `view_y_deg`.
+  rectilinear_projection:
+    focallength_mm: null           # Focal length in millimeters. Set to `null` if unknown.
+    view_x_deg: 72              # Horizontal field of view in degrees. Mandatory if `focallength_mm` is `null`.
+    view_y_deg: null               # Vertical field of view in degrees. Optional; set if known.
+    sensor_width_mm: null          # Sensor width in millimeters.
+    sensor_height_mm: null         # Sensor height in millimeters.
+
+  # SPATIAL ORIENTATION PARAMETERS (you may also set an object like {min: 0, max: 10, init: 5} to set fit constraints)
+  spatial_orientation:
+    # heading_deg: null            # Camera heading in degrees, north is the reference. Do not set if unknown.
+    # tilt_deg: null                 # Camera tilt angle in degrees. Do not set if unknown.
+    # roll_deg: null                 # Camera roll angle in degrees. Do not set if unknown.
+    # elevation_m: 5             # Camera elevation in meters. Do not set if unknown.
+    pos_x_m: 0                       # X position of the camera in meters; set to 0 for origin.
+    pos_y_m: 0                       # Y position of the camera in meters; set to 0 for origin.
+
+  # BROWN LENS DISTORTION PARAMETERS (you may also set an object like {min: 0, max: 10, init: 5} to set fit constraints)
+  brown_lens_distortion: 
+  #   # k1: null                       # Distortion coefficient k1. Do not set if unknown.
+  #   # k2: null                       # Distortion coefficient k2. Do not set if unknown.
+    k3: 0                            # Distortion coefficient k3. Do not set if unknown.
+
+  # GPS LOCATION OF THE CAMERA (mandatory)
+  gps_location:
+    lat: 39.97559002347724
+    lon: -86.1270794622172
+    
+landmarks:
+  - [[607,750],[39.975704766739796, -86.12717696410697,0.1]]
+  - [[1288,568],[39.975782077017406, -86.12710316984486,0]]
+  - [[1348,441],[39.97588741720748, -86.12710384039576,0]]
+  - [[1170,928],[39.975669540842766, -86.1271002489701,0]]
+  - [[1501,436],[39.97591063407435, -86.12706199850287,0]]
+  - [[1038,451],[39.9758679841798, -86.12717666293105,0]]
+  - [[1920,504],[39.97586438719532, -86.12696007456687,0]]
+  - [[385,574],[39.9757698379316, -86.12728529238953,0]]
+  - [[196,1069],[39.975645301759364, -86.12717654865999,0.1]]
+  - [[1477,323],[39.976238851491274, -86.1270619985128,0]]
+  - [[824,543], [39.97579020899379, -86.12719331246527,0]]
+  - [[1659,588],[39.975779418040105, -86.12704109711322,0.1]]
+  - [[341,695],[39.975716301704914, -86.12723637106906,0]]
+  - [[1887,569],[39.97580459693259, -86.12698879403976,0]]
+
+#   - [[1107, 1355], [39.975640339428814, -86.1270957087724, 0]]            # Format: [[px_x, px_y], [lat, lon, elev_m]]
+# #   - [[609,753], [39.97570506487, -86.12717756644481, 0.1]]
+# #   - [[1351,447], [39.975887566154995, -86.12710441429941,0]]
+# #   - [[1919,507],[39.97586649380414, -86.12696021596896,0]]
+# #   - [[1291,581],[39.97579248354361, -86.12710374361174,0]]
+#   - [[477,1173],[39.97564497599324, -86.12714308441622,0]]
+#   - [[961,1403],[39.97563681185661, -86.127103812049,0]]
+# #   # - [[189,1069],[39.9756454907049, -86.12717617812069,0.2]]
+# #   # - [[1720,622],[39.97576832602807, -86.12703600158584,0.2]]
+# #   # - [[2491,1000],[39.9756712073519, -86.12697162858345,0.2]]
+#   - [[269,581],[39.975769353739125, -86.1273196451864, 0]]
+# #   - [[1037,456],[39.97586493071219, -86.12717949977794,0.1]] 
+# #   - [[1503,441], [39.97591024814056, -86.12706490469586,0]]
+# #   - [[1499,418], [39.97593929477572, -86.12706259351656,0]]
+# # #  - [[1579,911], [39.97568814852524, -86.12706311611959, 0]]
+#   - [[1167,940],[39.97566918478008, -86.12710045928795,0]]
+#   - [[1196,414], [39.97592142996607, -86.12715180158857,0.1]]
+#   - [[1360,287], [39.97647587609698, -86.12715716600687, 0]]
+#   - [[695,937],[39.97567779422236, -86.127142762426,0]]
+#   - [[1047,577],[39.97577548342932, -86.12714398853173,0]]
+#   - [[1527,639],[39.97576212319784, -86.12706620447503,0]]
+# ITERATION SETTINGS FOR METROPOLIS OPTIMIZATION
+iteration_num: 6000               # Number of iterations for the Metropolis optimization.
+
+# TOP VIEW SETTINGS
+top_view:
+  do_plot: true                    # Set to `true` to generate a top-view image; `false` to disable.
+  extent: [-100, 100, -100, 100]       # Extent of the top view in meters: [x_min, x_max, y_min, y_max].
+                                   # Leave as `null` to auto-calculate an appropriate extent.
+  m_per_pixel: 0.05                # Scaling factor for top view; represents meters per pixel. 
+                                   # Leave as `null` for auto-scaling.
+
+# OPTION TO SAVE FITTED CAMERA PARAMETERS
+save_cam: true                     # Set to `true` to save the fitted camera parameters; `false` to disable.

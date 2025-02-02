@@ -24,16 +24,16 @@ class RectilinearProjection(BaseModel):
     sensor_height_mm: Optional[float] = None
 
 class SpatialOrientation(BaseModel):
-    heading_deg: Union[float, FitConstraint] = FitConstraint(min=0, max=360, init=0)
+    heading_deg: Union[float, FitConstraint] = FitConstraint(min=160, max=200, init=180)
     tilt_deg: Union[float, FitConstraint] = FitConstraint(min=0, max=90, init=70)
     roll_deg: Union[float, FitConstraint] = FitConstraint(min=-90, max=90, init=0)
-    elevation_m: Union[float, FitConstraint] = FitConstraint(min=0, max=25, init=5)
+    elevation_m: Union[float, FitConstraint] = FitConstraint(min=4.5, max=5.5, init=5)
     pos_x_m: float = 0
     pos_y_m: float = 0
 
 class BrownLensDistortion(BaseModel):
-    k1: Union[float, FitConstraint] = FitConstraint(min=-1.5, max=1.5, init=0)
-    k2: Union[float, FitConstraint] = FitConstraint(min=-0.2, max=0.2, init=0)
+    k1: Union[float, FitConstraint] = FitConstraint(min=-1, max=1, init=0.5)
+    k2: Union[float, FitConstraint] = FitConstraint(min=-0.4, max=0.4, init=0)
     k3: Union[float, FitConstraint] = FitConstraint(min=-0.2, max=0.2, init=0)
 
 class GPSLocation(BaseModel):

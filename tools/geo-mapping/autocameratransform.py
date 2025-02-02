@@ -39,7 +39,7 @@ if args.lower_angle_x:
             if cam.get_perf() < batch_min:
                 batch_min = cam.get_perf()
         batch_mins.append((view_x_deg, round(batch_min, 2)))
-    pprint(batch_mins)
+    print(batch_mins)
 else:
     best_camera = Camerafit(fitconfig=config_obj)
     best_view_x = config_obj.camera_parameters.rectilinear_projection.view_x_deg
@@ -52,9 +52,10 @@ for attr, value in best_camera.__dict__.items():
 print(f"Best solution: Average Distance {best_camera.get_perf():.2f} meters (view_x_deg={best_view_x})")
 best_camera.plot_fit_information_image_space('info.png')
 best_camera.plot_trace('trace.png')
-cv2.imwrite('undistorted.png', best_camera.get_undistorted_image())
+cv2.imwrite('undistorted.png', cv2.cvtColor(best_camera.get_undistorted_image(),cv2.COLOR_BGR2RGB))
 
 topview_im = best_camera.get_topview()
+topview_im = cv2.cvtColor(topview_im, cv2.COLOR_BGR2RGB)
 cv2.imwrite('topview.jpg', topview_im)
 
 best_camera.save_cam()

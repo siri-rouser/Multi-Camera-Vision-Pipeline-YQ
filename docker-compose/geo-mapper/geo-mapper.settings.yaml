@@ -1,6 +1,6 @@
 cameras:
   - stream_id: stream1
-    cam_config_path: '/code/fitted_cam_NB_new.json'
+    cam_config_path: '/code/fitted_cam_NB.json'
     passthrough: false          # If the stream should be passed through without geo mapping (all other parameters are ignored if true)
     # mapping_area:               # Must be a geojson `Polygon`. If set, only detections within that polygon will be mapped (i.e. will have coordinates set)
     #   type: Polygon

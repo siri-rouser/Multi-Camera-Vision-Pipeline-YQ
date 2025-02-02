@@ -108,7 +108,7 @@ services:
     image: mcvt_yq/geomapper:latest
     volumes:
       - ./geo-mapper/geo-mapper.settings.yaml:/code/settings.yaml
-      - ./geo-mapper/cam_config/fitted_camNB.json:/code/fitted_cam_NB_new.json
+      - ./geo-mapper/cam_config/fitted_camNB.json:/code/fitted_cam_NB.json
       - ./geo-mapper/cam_config/fitted_camSB.json:/code/fitted_camSB.json
     depends_on:
       redis:
