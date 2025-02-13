@@ -1,7 +1,7 @@
 paths:
-  video-stream1:
-    runOnDemand: ffmpeg -re -stream_loop -1 -i /video1 -c copy -f rtsp rtsp://localhost:$RTSP_PORT/$MTX_PATH
-    runOnDemandRestart: yes
+  # video-stream1:
+  #   runOnDemand: ffmpeg -re -stream_loop -1 -i /video1 -c copy -f rtsp rtsp://localhost:$RTSP_PORT/$MTX_PATH
+  #   runOnDemandRestart: yes
 
   video-stream2:
     runOnDemand: ffmpeg -re -stream_loop -1 -i /video2 -c copy -f rtsp rtsp://localhost:$RTSP_PORT/$MTX_PATH

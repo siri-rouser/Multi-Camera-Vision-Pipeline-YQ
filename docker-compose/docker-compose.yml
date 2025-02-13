@@ -13,13 +13,13 @@ services:
       interval: 1s
       start_period: 5s
 
-  video-source-stream1:
-    image: ${IMAGE_REGISTRY}/sae-video-source-py:${VIDEO_SOURCE_VERSION}
-    volumes:
-      - ./video-source-py/video-source-stream1.settings.yaml:/code/settings.yaml
-    depends_on:
-      redis:
-        condition: service_healthy
+  # video-source-stream1:
+  #   image: ${IMAGE_REGISTRY}/sae-video-source-py:${VIDEO_SOURCE_VERSION}
+  #   volumes:
+  #     - ./video-source-py/video-source-stream1.settings.yaml:/code/settings.yaml
+  #   depends_on:
+  #     redis:
+  #       condition: service_healthy
 
   video-source-stream2:
     image: ${IMAGE_REGISTRY}/sae-video-source-py:${VIDEO_SOURCE_VERSION}
@@ -49,13 +49,23 @@ services:
     image: bluenviron/mediamtx:1.0.0-ffmpeg
     volumes:
       - ./streaming-server/mediamtx.yml:/mediamtx.yml
-      - ${VIDEO_PATH1}:/video1
+      # - ${VIDEO_PATH1}:/video1
       - ${VIDEO_PATH2}:/video2
     environment:
       MTX_PROTOCOLS: tcp
     ports:
       - 8554:8554
 
+  geo-mapper:
+    image: mcvt_yq/geomapper:latest
+    volumes:
+      - ./geo-mapper/geo-mapper.settings.yaml:/code/settings.yaml
+      # - ./geo-mapper/cam_config/fitted_camNB.json:/code/fitted_cam_NB.json
+      - ./geo-mapper/cam_config/fitted_camSB.json:/code/fitted_camSB.json
+    depends_on:
+      redis:
+        condition: service_healthy
+    
   feature-extractor1:
     image: mcvt_yq/feature_extractor_temp:latest
     volumes:
@@ -100,16 +110,6 @@ services:
     image: mcvt_yq/object_tracker:latest
     volumes:
       - ./object-tracker/object-tracker-stream2.settings.yaml:/code/settings.yaml
-    depends_on:
-      redis:
-        condition: service_healthy
-    
-  geo-mapper:
-    image: mcvt_yq/geomapper:latest
-    volumes:
-      - ./geo-mapper/geo-mapper.settings.yaml:/code/settings.yaml
-      - ./geo-mapper/cam_config/fitted_camNB.json:/code/fitted_cam_NB.json
-      - ./geo-mapper/cam_config/fitted_camSB.json:/code/fitted_camSB.json
     depends_on:
       redis:
         condition: service_healthy
