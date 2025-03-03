@@ -13,18 +13,32 @@ services:
       interval: 1s
       start_period: 5s
 
+  streaming-server:
+    image: bluenviron/mediamtx:1.0.0-ffmpeg
+    volumes:
+      - ./streaming-server/mediamtx.yml:/mediamtx.yml
+      # - ${VIDEO_PATH1}:/video1
+      - ${VIDEO_PATH2}:/video2
+    environment:
+      MTX_PROTOCOLS: tcp
+    ports:
+      - 8554:8554
+
+
   # video-source-stream1:
   #   image: ${IMAGE_REGISTRY}/sae-video-source-py:${VIDEO_SOURCE_VERSION}
   #   volumes:
   #     - ./video-source-py/video-source-stream1.settings.yaml:/code/settings.yaml
+  #     - ./video-source-py/points_NB.txt:/code/points_NB.txt
   #   depends_on:
   #     redis:
   #       condition: service_healthy
 
   video-source-stream2:
-    image: ${IMAGE_REGISTRY}/sae-video-source-py:${VIDEO_SOURCE_VERSION}
+    image: mcvt_yq/video_source_py:v1.0
     volumes:
       - ./video-source-py/video-source-stream2.settings.yaml:/code/settings.yaml
+      - ./video-source-py/points_SB.txt:/code/points_SB.txt
     depends_on:
       redis:
         condition: service_healthy
@@ -45,16 +59,6 @@ services:
               count: all
               capabilities: [gpu]
                   
-  streaming-server:
-    image: bluenviron/mediamtx:1.0.0-ffmpeg
-    volumes:
-      - ./streaming-server/mediamtx.yml:/mediamtx.yml
-      # - ${VIDEO_PATH1}:/video1
-      - ${VIDEO_PATH2}:/video2
-    environment:
-      MTX_PROTOCOLS: tcp
-    ports:
-      - 8554:8554
 
   geo-mapper:
     image: mcvt_yq/geomapper:latest
@@ -98,7 +102,7 @@ services:
 
 
   object-tracker-stream1:
-    image: mcvt_yq/object_tracker:latest
+    image: mcvt_yq/object_tracker:v1.0
     volumes:
       - ./object-tracker/object-tracker-stream1.settings.yaml:/code/settings.yaml
     depends_on:
@@ -107,7 +111,7 @@ services:
 
   
   object-tracker-stream2:
-    image: mcvt_yq/object_tracker:latest
+    image: mcvt_yq/object_tracker:v1.0
     volumes:
       - ./object-tracker/object-tracker-stream2.settings.yaml:/code/settings.yaml
     depends_on:

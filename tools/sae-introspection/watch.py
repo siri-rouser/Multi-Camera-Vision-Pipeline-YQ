@@ -16,6 +16,9 @@ DEFAULT_WINDOW_SIZE = (1280, 720)
 previous_frame_timestamp = 0
 args = None
 
+def average(lst):
+    return sum(lst) / len(lst) if lst else 0
+
 def isWindowVisible(window_name):
     try:
         windowVisibleProp = int(cv2.getWindowProperty(window_name, cv2.WND_PROP_VISIBLE))
@@ -68,7 +71,7 @@ def showImage(stream_id, image):
         stop_event.set()
         cv2.destroyAllWindows()
 
-def handle_sae_message(sae_message_bytes, stream_key):
+def handle_sae_message(sae_message_bytes, stream_key,time_dict):
     global previous_frame_timestamp, args
 
     sae_msg = SaeMessage()
@@ -78,10 +81,15 @@ def handle_sae_message(sae_message_bytes, stream_key):
     previous_frame_timestamp = sae_msg.frame.timestamp_utc_ms
 
     log_line = f'E2E-Delay: {round(time.time() * 1000 - sae_msg.frame.timestamp_utc_ms): >8} ms, Display Frametime: {frametime: >5} ms'
+    log_line1 = ''
     if sae_msg.HasField('metrics'):
-        log_line += f', Detection: {sae_msg.metrics.detection_inference_time_us: >7} us, Feature_extraction: {sae_msg.metrics.feature_extraction_time_us: >7} us, Tracking: {sae_msg.metrics.tracking_inference_time_us: >7} us, Merging: {sae_msg.metrics.merge_inference_time_us:>7} us'
-    print(log_line, file=sys.stderr)
-
+        time_dict['detection_time'].append(sae_msg.metrics.detection_inference_time_us)
+        time_dict['feature_extraction_time'].append(sae_msg.metrics.feature_extraction_time_us)
+        time_dict['tracking_time'].append(sae_msg.metrics.tracking_inference_time_us)
+        log_line1 += f'Detection: {sae_msg.metrics.detection_inference_time_us: >7} us, Feature_extraction: {sae_msg.metrics.feature_extraction_time_us: >7} us, Tracking: {sae_msg.metrics.tracking_inference_time_us: >7} us'
+        print(log_line1, file=sys.stderr)
+    avg_log_line = f'average_detection_time:{average(time_dict["detection_time"]): >7} us, average_feature_extraction_time:{average(time_dict["feature_extraction_time"]): >7} us, average_tracking_time:{average(time_dict["tracking_time"]): >7} us'
+    print(avg_log_line, file=sys.stderr)
     image = get_image(sae_msg)
 
     for detection in sae_msg.detections:
@@ -92,7 +100,7 @@ def handle_sae_message(sae_message_bytes, stream_key):
     
     showImage(stream_key, image)
 
-    return image
+    return image, time_dict
     
 
 
@@ -121,6 +129,10 @@ if __name__ == '__main__':
     consume = RedisConsumer(REDIS_HOST, REDIS_PORT, [STREAM_KEY], block=200)
 
     video_writer = cv2.VideoWriter('record.mp4', cv2.VideoWriter_fourcc(*'mp4v') , 10.0, (2560, 1440))
+    time_dict = {}
+    time_dict['detection_time'] = []
+    time_dict['feature_extraction_time'] = []
+    time_dict['tracking_time'] = []
 
     with consume:
         for stream_key, proto_data in consume():
@@ -130,6 +142,6 @@ if __name__ == '__main__':
             if stream_key is None:
                 continue
             
-            image = handle_sae_message(proto_data, stream_key)
+            image,time_dict = handle_sae_message(proto_data, stream_key,time_dict)
 
             video_writer.write(image)
