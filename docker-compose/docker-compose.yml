@@ -24,7 +24,6 @@ services:
     ports:
       - 8554:8554
 
-
   # video-source-stream1:
   #   image: ${IMAGE_REGISTRY}/sae-video-source-py:${VIDEO_SOURCE_VERSION}
   #   volumes:

@@ -1,3 +1,6 @@
 carmel_data/
 *.mp4
 subpackages/TensorRT
+*.engine
+*.onnx
+*.pt
