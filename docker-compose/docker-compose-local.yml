@@ -15,9 +15,10 @@ services:
 
   streaming-server:
     image: bluenviron/mediamtx:1.0.0-ffmpeg
+    # image: bluenviron/mediamtx:latest-ffmpeg
     volumes:
       - ./streaming-server/mediamtx.yml:/mediamtx.yml
-      # - ${VIDEO_PATH1}:/video1
+      - ${VIDEO_PATH1}:/video1
       - ${VIDEO_PATH2}:/video2
     environment:
       MTX_PROTOCOLS: tcp
@@ -25,7 +26,7 @@ services:
       - 8554:8554
 
   video-source-stream1:
-    image: ${IMAGE_REGISTRY}/sae-video-source-py:${VIDEO_SOURCE_VERSION}
+    image: sirirouser/video_source_py:v3.1
     volumes:
       - ./video-source-py/video-source-stream1.settings.yaml:/code/settings.yaml
       - ./video-source-py/points_NB.txt:/code/points_NB.txt
@@ -34,7 +35,7 @@ services:
         condition: service_healthy
 
   video-source-stream2:
-    image: mcvt_yq/video_source_py:v3.1
+    image: sirirouser/video_source_py:v3.1
     volumes:
       - ./video-source-py/video-source-stream2.settings.yaml:/code/settings.yaml
       - ./video-source-py/points_SB.txt:/code/points_SB.txt
@@ -42,11 +43,8 @@ services:
       redis:
         condition: service_healthy
 
-# 
-# ssh yuqiang@192.168.55.1 "cd /home/yuqiang/yl4300/Multi-Camera-Vision-Pipeline-YQ/docker-compose/ && docker compose up video-source-stream1"; docker compose up video-source-stream2 
-
   object-detector:
-    image: sirirouser/object_detector:v2.0
+    image: sirirouser/object_detector:v3.0
     volumes:
       - ./object-detector/object-detector.settings.yaml:/code/settings.yaml
       - ./object-detector/weights/yolo11l.engine:/code/yolo11l.engine
@@ -66,7 +64,7 @@ services:
     image: mcvt_yq/geomapper:latest
     volumes:
       - ./geo-mapper/geo-mapper.settings.yaml:/code/settings.yaml
-      # - ./geo-mapper/cam_config/fitted_camNB.json:/code/fitted_cam_NB.json
+      - ./geo-mapper/cam_config/fitted_camNB.json:/code/fitted_cam_NB.json
       - ./geo-mapper/cam_config/fitted_camSB.json:/code/fitted_camSB.json
     depends_on:
       redis:
@@ -103,7 +101,7 @@ services:
               capabilities: [gpu]
 
   object-tracker-stream1:
-    image: mcvt_yq/object_tracker:v1.0
+    image: sirirouser/object_tracker:v3.0
     volumes:
       - ./object-tracker/object-tracker-stream1.settings.yaml:/code/settings.yaml
     depends_on:
@@ -112,10 +110,18 @@ services:
 
   
   object-tracker-stream2:
-    image: sirirouser/object_tracker:v2.0
+    image: sirirouser/object_tracker:v3.0
     volumes:
       - ./object-tracker/object-tracker-stream2.settings.yaml:/code/settings.yaml
     depends_on:
       redis:
         condition: service_healthy
-    
+  
+  # tracklet-merger:
+  #   image: sirirouser/tracklet_merger:v1.0
+  #   volumes:
+  #     - ./tracklet-merger/tracklet-merger.settings.yaml:/code/settings.yaml
+  #     - ./tracklet-merger/merged_results.txt:/code/merged_results.txt
+  #   depends_on:
+  #     redis:
+  #       condition: service_healthy

@@ -7,15 +7,12 @@ import redis
 from turbojpeg import TurboJPEG
 from visionapi_yq.messages_pb2 import SaeMessage
 from visionlib.pipeline.consumer import RedisConsumer
-from visionlib.pipeline.tools import get_raw_frame_data,MESSAGE_SEPARATOR, DumpMeta, Event, EventMeta
-
-
-# from visionlib.pipeline.saedump import MESSAGE_SEPARATOR, DumpMeta, Event, EventMeta
+from visionlib.pipeline.tools import get_raw_frame_data
+from visionlib.saedump import MESSAGE_SEPARATOR, DumpMeta, Event, EventMeta
 
 from common import choose_streams, default_arg_parser, register_stop_handler
 
 jpeg = TurboJPEG()
-
 
 def write_meta(file: TextIO, start_time: float, stream_keys: list[str]):
     meta = DumpMeta(
@@ -95,13 +92,12 @@ if __name__ == '__main__':
 
     start_time = time.time()
 
-
     with consume, open(args.output_file, 'x') as output_file:
         
         write_meta(output_file, start_time, STREAM_KEYS)
 
         for stream_key, proto_data in consume():
-            if stop_event.is_set(): 
+            if stop_event.is_set():
                 break
 
             if stream_key is None:
@@ -111,4 +107,4 @@ if __name__ == '__main__':
                 print(f'Reached configured time limit of {args.time_limit}s')
                 break
 
-            write_event(output_file, stream_key, proto_data, is_remove_frame=False, scale_width=0, scale_quality=85)
+            write_event(output_file, stream_key, proto_data, args.remove_frame, args.downscale_frames, args.downscale_jpeg_quality)

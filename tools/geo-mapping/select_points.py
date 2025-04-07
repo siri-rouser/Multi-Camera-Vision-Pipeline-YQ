@@ -11,7 +11,7 @@ def click_event(event, x, y, flags, param):
         cv2.imshow("Image", img)
 
 if __name__ == "__main__":
-    image_path = '/home/yuqiang/yl4300/project/Multi-Camera-Vision-Pipeline-YQ/carmel_data/RangelinePhelpsNB.jpg'
+    image_path = '/home/yuqiang/yl4300/project/Multi-Camera-Vision-Pipeline-YQ/carmel_data/RangelineElmSB.jpg'
     img = cv2.imread(image_path)
     if img is None:
         print("Error: Unable to load image!")
@@ -26,7 +26,7 @@ if __name__ == "__main__":
             break
 
     cv2.destroyAllWindows()
-    output_file = 'points_NB.txt'
+    output_file = 'points_SB.txt'
     with open(output_file, "w") as f:
         for x, y in points:
             f.write(f"{x} {y}\n")

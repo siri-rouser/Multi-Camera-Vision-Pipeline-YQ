@@ -71,7 +71,7 @@ def showImage(stream_id, image):
         stop_event.set()
         cv2.destroyAllWindows()
 
-def handle_sae_message(sae_message_bytes, stream_key,time_dict):
+def handle_sae_message(sae_message_bytes, stream_key, time_dict):
     global previous_frame_timestamp, args
 
     sae_msg = SaeMessage()
@@ -79,18 +79,29 @@ def handle_sae_message(sae_message_bytes, stream_key,time_dict):
 
     frametime = sae_msg.frame.timestamp_utc_ms - previous_frame_timestamp
     previous_frame_timestamp = sae_msg.frame.timestamp_utc_ms
-
     log_line = f'E2E-Delay: {round(time.time() * 1000 - sae_msg.frame.timestamp_utc_ms): >8} ms, Display Frametime: {frametime: >5} ms'
-    log_line1 = ''
     if sae_msg.HasField('metrics'):
+        log_line_detail = f', Detection: {sae_msg.metrics.detection_inference_time_us: >7} us, Feature_extraction: {sae_msg.metrics.feature_extraction_time_us: >7} us, Tracking: {sae_msg.metrics.tracking_inference_time_us: >7} us, Merge: {sae_msg.metrics.merge_inference_time_us: >7} us'
+        print(log_line_detail, file=sys.stderr)
         time_dict['detection_time'].append(sae_msg.metrics.detection_inference_time_us)
         time_dict['feature_extraction_time'].append(sae_msg.metrics.feature_extraction_time_us)
         time_dict['tracking_time'].append(sae_msg.metrics.tracking_inference_time_us)
-        log_line1 += f'Detection: {sae_msg.metrics.detection_inference_time_us: >7} us, Feature_extraction: {sae_msg.metrics.feature_extraction_time_us: >7} us, Tracking: {sae_msg.metrics.tracking_inference_time_us: >7} us'
-        print(log_line1, file=sys.stderr)
-    avg_log_line = f'average_detection_time:{average(time_dict["detection_time"]): >7} us, average_feature_extraction_time:{average(time_dict["feature_extraction_time"]): >7} us, average_tracking_time:{average(time_dict["tracking_time"]): >7} us'
+        time_dict['merge_inference_time'].append(sae_msg.metrics.merge_inference_time_us)
+    print(log_line, file=sys.stderr)
+    avg_log_line = f'average_detection_time:{average(time_dict["detection_time"]): >7} us, average_feature_extraction_time:{average(time_dict["feature_extraction_time"]): >7} us, average_tracking_time:{average(time_dict["tracking_time"]): >7} us, average_merge_inference_time:{average(time_dict["merge_inference_time"]): >7} us'
     print(avg_log_line, file=sys.stderr)
     image = get_image(sae_msg)
+
+    # Annotate the timestamp at the top-left corner of the frame
+    timestamp_text = f'Timestamp: {sae_msg.frame.timestamp_utc_ms} ms, frame_id: {sae_msg.frame.frame_id}'
+    font_scale = 2
+    font_thickness = 1
+    text_color = (255, 255, 255)  # White
+    text_background_color = (0, 0, 0)  # Black
+    text_size, _ = cv2.getTextSize(timestamp_text, cv2.FONT_HERSHEY_SIMPLEX, font_scale, font_thickness)
+    text_x, text_y = 10, 10 + text_size[1]
+    cv2.rectangle(image, (text_x - 5, text_y - text_size[1] - 5), (text_x + text_size[0] + 5, text_y + 5), text_background_color, -1)
+    cv2.putText(image, timestamp_text, (text_x, text_y), cv2.FONT_HERSHEY_SIMPLEX, font_scale, text_color, font_thickness, cv2.LINE_AA)
 
     for detection in sae_msg.detections:
         annotate(image, detection)
@@ -99,6 +110,9 @@ def handle_sae_message(sae_message_bytes, stream_key,time_dict):
         sys.stdout.buffer.write(image)
     
     showImage(stream_key, image)
+
+    # For checking time stamp
+    # print('sae_msg timestamp:', sae_msg.frame.frame_id)
 
     return image, time_dict
     
@@ -133,6 +147,7 @@ if __name__ == '__main__':
     time_dict['detection_time'] = []
     time_dict['feature_extraction_time'] = []
     time_dict['tracking_time'] = []
+    time_dict['merge_inference_time'] = []
 
     with consume:
         for stream_key, proto_data in consume():

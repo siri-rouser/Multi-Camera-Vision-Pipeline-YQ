@@ -1,0 +1,19 @@
+log_level: INFO
+redis:
+  host: redis
+  port: 6379
+  stream_id: aggregate
+  input_stream_prefix: objecttracker
+  output_stream_prefix: trackletmerger
+prometheus_port: 8000
+save_path: '/code/merged_results.txt'
+merging_config:
+  input_stream_ids: 
+    - stream1
+    - stream2
+  output_stream_id: merger
+  matching_metric: Cosine_Distance
+  dis_thre: 0.6
+  dis_remove: 0.7
+  dis_alpha: 1 # alpha is for the apperabce distance metric
+  dis_beta: 0.7 # beta is for the temporla spatial metric

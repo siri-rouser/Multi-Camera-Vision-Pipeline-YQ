@@ -20,7 +20,7 @@ tracker_config:
   appearance_thresh: 0.25
   with_reid: False
   match_thresh: 0.8
-  frame_rate: 13
+  frame_rate: 15
 
 
 log_level: DEBUG

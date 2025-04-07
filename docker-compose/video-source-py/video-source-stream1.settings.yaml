@@ -1,9 +1,12 @@
 id: stream1
 uri: rtsp://streaming-server:8554/video-stream1
-mask: True
+mask: TRUE
 mask_polygon_location: /code/points_NB.txt
+start_time: "2025-03-10 18:42:00"
 reconnect_backoff_time: 1
-max_fps: 10
+max_fps: 15
+thread_frame_count: True
+thread_frame_ratio: 0.9986
 jpeg_encode: True
 log_level: DEBUG
 redis:
