@@ -101,18 +101,20 @@ services:
               capabilities: [gpu]
 
   object-tracker-stream1:
-    image: sirirouser/object_tracker:v3.0
+    image: sirirouser/object_tracker:v4.3
     volumes:
       - ./object-tracker/object-tracker-stream1.settings.yaml:/code/settings.yaml
+      - ./object-tracker/stream1.txt:/code/stream1.txt
     depends_on:
       redis:
         condition: service_healthy
 
   
   object-tracker-stream2:
-    image: sirirouser/object_tracker:v3.0
+    image: sirirouser/object_tracker:v4.3
     volumes:
       - ./object-tracker/object-tracker-stream2.settings.yaml:/code/settings.yaml
+      - ./object-tracker/stream2.txt:/code/stream2.txt
     depends_on:
       redis:
         condition: service_healthy

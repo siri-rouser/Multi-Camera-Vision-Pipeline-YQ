@@ -17,17 +17,21 @@
 #     max_age: 30
 #     n_init: 3 # change in DeepSort, it is meaningless to setup this value in here. 
 #     multi_camera_tracking: TRUE
+save_config:
+  save_path: '/code/stream1.txt'
+  save: True
+
 tracker_algorithm: SMILETRACK
 tracker_config:
-  min_confidence: 0.45
+  min_confidence: 0.4
   multi_camera_tracking: TRUE
   track_low_thresh: 0.45
   track_high_thresh: 0.5
-  new_track_thresh: 0.6
+  new_track_thresh: 0.65
   track_buffer: 30
   proximity_thresh: 0.5
   appearance_thresh: 0.25
-  with_reid: False
+  with_reid: True
   match_thresh: 0.8
   frame_rate: 15
 
