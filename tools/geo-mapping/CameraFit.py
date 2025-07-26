@@ -24,10 +24,10 @@ class RectilinearProjection(BaseModel):
     sensor_height_mm: Optional[float] = None
 
 class SpatialOrientation(BaseModel):
-    heading_deg: Union[float, FitConstraint] = FitConstraint(min=160, max=200, init=180)
+    heading_deg: Union[float, FitConstraint] = FitConstraint(min=0, max=90, init=60) # Heading of the camera in degrees, 0 is North, 90 is East, 180 is South, 270 is West.
     tilt_deg: Union[float, FitConstraint] = FitConstraint(min=0, max=90, init=70)
     roll_deg: Union[float, FitConstraint] = FitConstraint(min=-90, max=90, init=0)
-    elevation_m: Union[float, FitConstraint] = FitConstraint(min=4.5, max=5.5, init=5)
+    elevation_m: Union[float, FitConstraint] = FitConstraint(min=5, max=10, init=6)
     pos_x_m: float = 0
     pos_y_m: float = 0
 
@@ -223,9 +223,9 @@ class Camerafit():
         m_per_pixel = self._fitconfig.top_view.m_per_pixel
         return (int(-self._fitconfig.top_view.extent[0] // m_per_pixel), int(-self._fitconfig.top_view.extent[2] // m_per_pixel))
         
-    def save_cam(self):
+    def save_cam(self,path:Path):
         if self._fitconfig.save_cam:
-            self.camera.save('fitted_cam.json')
+            self.camera.save(path)
 
     def get_perf(self) -> float:
         calculated_points = self.camera.gpsFromImage(self._fitconfig.px_locations, Z=0)

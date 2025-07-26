@@ -1,0 +1,148 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:7.0
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+    ports:
+      - 6379:6379
+    volumes:
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+    healthcheck:
+      test: "[ \"$(redis-cli ping)\" = \"PONG\" ] && exit 0 || exit 1"
+      interval: 1s
+      start_period: 5s
+
+  streaming-server:
+    image: bluenviron/mediamtx:1.0.0-ffmpeg
+    # image: bluenviron/mediamtx:latest-ffmpeg
+    volumes:
+      - ./streaming-server/mediamtx.yml:/mediamtx.yml
+      - ${VIDEO_PATH1}:/video1
+      - ${VIDEO_PATH2}:/video2
+      - ${VIDEO_PATH3}:/video3
+      - ${VIDEO_PATH4}:/video4
+    environment:
+      MTX_PROTOCOLS: tcp
+    ports:
+      - 8554:8554
+
+  # video-source-stream1:
+  #   image: sirirouser/video_source_py:v3.1
+  #   volumes:
+  #     - ./video-source-py/video-source-stream1.settings.yaml:/code/settings.yaml
+  #     - ./video-source-py/points_NB.txt:/code/points_NB.txt
+  #   depends_on:
+  #     redis:
+  #       condition: service_healthy
+
+  # video-source-stream2:
+  #   image: sirirouser/video_source_py:v3.1
+  #   volumes:
+  #     - ./video-source-py/video-source-stream2.settings.yaml:/code/settings.yaml
+  #     - ./video-source-py/points_SB.txt:/code/points_SB.txt
+  #   depends_on:
+  #     redis:
+  #       condition: service_healthy
+  # video-source-stream3:
+  #   image: sirirouser/video_source_py:v3.1
+  #   volumes:
+  #     - ./video-source-py/video-source-stream3.settings.yaml:/code/settings.yaml
+  #     - ./video-source-py/points_NB.txt:/code/points_NB.txt
+  #   depends_on:
+  #     redis:
+  #       condition: service_healthy
+
+  video-source-stream4:
+    image: sirirouser/video_source_py:v3.1
+    volumes:
+      - ./video-source-py/video-source-stream4.settings.yaml:/code/settings.yaml
+      - ./video-source-py/points_SB.txt:/code/points_SB.txt
+    depends_on:
+      redis:
+        condition: service_healthy
+        
+  # object-detector:
+  #   image: sirirouser/object_detector:v3.0
+  #   volumes:
+  #     - ./object-detector/object-detector.settings.yaml:/code/settings.yaml
+  #     - ./object-detector/weights/yolo11l.engine:/code/yolo11l.engine
+  #   depends_on:
+  #     redis:
+  #       condition: service_healthy
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #           - driver: nvidia
+  #             count: all
+  #             capabilities: [gpu]
+                  
+
+  # geo-mapper:
+  #   image: mcvt_yq/geomapper:latest
+  #   volumes:
+  #     - ./geo-mapper/geo-mapper.settings.yaml:/code/settings.yaml
+  #     - ./geo-mapper/cam_config/fitted_camNB.json:/code/fitted_cam_NB.json
+  #     - ./geo-mapper/cam_config/fitted_camSB.json:/code/fitted_camSB.json
+  #   depends_on:
+  #     redis:
+  #       condition: service_healthy
+    
+  # feature-extractor1:
+  #   image: mcvt_yq/feature_extractor_temp:latest
+  #   volumes:
+  #     - ./feature-extractor/feature-extractor1.settings.yaml:/code/settings.yaml
+  #   depends_on:
+  #     redis:
+  #       condition: service_healthy
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #           - driver: nvidia
+  #             count: all
+  #             capabilities: [gpu]
+
+  # feature-extractor2:
+  #   image: mcvt_yq/feature_extractor_temp:latest
+  #   volumes:
+  #     - ./feature-extractor/feature-extractor2.settings.yaml:/code/settings.yaml
+  #   depends_on:
+  #     redis:
+  #       condition: service_healthy
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #           - driver: nvidia
+  #             count: all
+  #             capabilities: [gpu]
+
+  # object-tracker-stream1:
+  #   image: sirirouser/object_tracker:v4.3
+  #   volumes:
+  #     - ./object-tracker/object-tracker-stream1.settings.yaml:/code/settings.yaml
+  #     - ./object-tracker/stream1.txt:/code/stream1.txt
+  #   depends_on:
+  #     redis:
+  #       condition: service_healthy
+
+  
+  # object-tracker-stream2:
+  #   image: sirirouser/object_tracker:v4.3
+  #   volumes:
+  #     - ./object-tracker/object-tracker-stream2.settings.yaml:/code/settings.yaml
+  #     - ./object-tracker/stream2.txt:/code/stream2.txt
+  #   depends_on:
+  #     redis:
+  #       condition: service_healthy
+  
+  # tracklet-merger:
+  #   image: sirirouser/tracklet_merger:v1.0
+  #   volumes:
+  #     - ./tracklet-merger/tracklet-merger.settings.yaml:/code/settings.yaml
+  #     - ./tracklet-merger/merged_results.txt:/code/merged_results.txt
+  #   depends_on:
+  #     redis:
+  #       condition: service_healthy

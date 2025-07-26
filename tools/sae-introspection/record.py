@@ -40,7 +40,7 @@ def write_event(file: TextIO, stream_key: str, proto_data, is_remove_frame=False
     )
 
     file.write(event.model_dump_json())
-    file.write(MESSAGE_SEPARATOR)
+    file.write(MESSAGE_SEPARATOR) # MESSAGE_SEPARATOR = ';'
 
 def remove_frame(proto_data):
     msg = SaeMessage()

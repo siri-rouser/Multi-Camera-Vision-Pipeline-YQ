@@ -16,3 +16,5 @@ redis:
   stream_ids: 
     - stream1
     - stream2 
+    - stream3
+    - stream4

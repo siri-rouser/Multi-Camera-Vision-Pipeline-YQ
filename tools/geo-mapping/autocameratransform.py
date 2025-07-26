@@ -12,6 +12,7 @@ argparser = argparse.ArgumentParser()
 argparser.add_argument('-l', '--lower-angle-x', type=float, help='Lower value of view_x_deg for parameter search')
 argparser.add_argument('-u', '--upper-angle-x', type=float, help='Upper value of view_x_deg for parameter search')
 argparser.add_argument('-s', '--step-size', type=float, default=1, help='Step size for view_x_deg search')
+argparser.add_argument('-c','--cam_name', type=str,help='Camera name to be used in the config file', default='cam01')
 argparser.add_argument('config_path', type=Path, help='The path to the autofit*.yaml')
 args = argparser.parse_args()
 
@@ -50,12 +51,12 @@ for attr, value in best_camera.__dict__.items():
     print(f"{attr}: {value}")
 
 print(f"Best solution: Average Distance {best_camera.get_perf():.2f} meters (view_x_deg={best_view_x})")
-best_camera.plot_fit_information_image_space('info.png')
-best_camera.plot_trace('trace.png')
-cv2.imwrite('undistorted.png', cv2.cvtColor(best_camera.get_undistorted_image(),cv2.COLOR_BGR2RGB))
+best_camera.plot_fit_information_image_space(f'./RoundaboutHD/{args.cam_name}/{args.cam_name}_info.png')
+best_camera.plot_trace(f'./RoundaboutHD/{args.cam_name}/{args.cam_name}_trace.png')
+cv2.imwrite(f'./RoundaboutHD/{args.cam_name}/{args.cam_name}_undistorted.png', cv2.cvtColor(best_camera.get_undistorted_image(),cv2.COLOR_BGR2RGB))
 
 topview_im = best_camera.get_topview()
 topview_im = cv2.cvtColor(topview_im, cv2.COLOR_BGR2RGB)
-cv2.imwrite('topview.jpg', topview_im)
+cv2.imwrite(f'./RoundaboutHD/{args.cam_name}/{args.cam_name}_topview.jpg', topview_im)
 
-best_camera.save_cam()
+best_camera.save_cam(f'./RoundaboutHD/{args.cam_name}/{args.cam_name}_fitted_cam.json')
