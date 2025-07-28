@@ -16,9 +16,6 @@ DEFAULT_WINDOW_SIZE = (1280, 720)
 previous_frame_timestamp = 0
 args = None
 
-def average(lst):
-    return sum(lst) / len(lst) if lst else 0
-
 def isWindowVisible(window_name):
     try:
         windowVisibleProp = int(cv2.getWindowProperty(window_name, cv2.WND_PROP_VISIBLE))
@@ -53,7 +50,7 @@ def annotate(image, detection: Detection):
     label = f'{class_id} - {round(conf,2)}'
 
     if detection.object_id is not None:
-        object_id = detection.object_id
+        object_id = detection.object_id.hex()[:4]
         label = f'ID {object_id} - {class_id} - {round(conf,2)}'
 
     line_width = max(round(sum(image.shape) / 2 * 0.002), 2)
@@ -62,16 +59,29 @@ def annotate(image, detection: Detection):
     cv2.putText(image, label, (bbox_x1, bbox_y1 - 10), fontFace=cv2.FONT_HERSHEY_SIMPLEX, color=ANNOTATION_COLOR, thickness=round(line_width/3), fontScale=line_width/4, lineType=cv2.LINE_AA)
 
 def showImage(stream_id, image):
+    displayed_image = image
+    
+    # When using fixed scale, resize the image before displaying
+    if args.fixed_scale:
+        scale_factor = args.fixed_scale
+        new_width = int(image.shape[1] * scale_factor)
+        new_height = int(image.shape[0] * scale_factor)
+        displayed_image = cv2.resize(image, (new_width, new_height), interpolation=cv2.INTER_AREA)
+    
     if not isWindowVisible(window_name=stream_id):
-        cv2.namedWindow(stream_id, cv2.WINDOW_NORMAL + cv2.WINDOW_KEEPRATIO)
-        cv2.resizeWindow(stream_id, *DEFAULT_WINDOW_SIZE)
+        if args.fixed_scale:
+            # Use WINDOW_AUTOSIZE to match the exact size of the scaled image
+            cv2.namedWindow(stream_id, cv2.WINDOW_AUTOSIZE)
+        else:
+            cv2.namedWindow(stream_id, cv2.WINDOW_NORMAL + cv2.WINDOW_KEEPRATIO)
+            cv2.resizeWindow(stream_id, *DEFAULT_WINDOW_SIZE)
         
-    cv2.imshow(stream_id, image)
+    cv2.imshow(stream_id, displayed_image)
     if cv2.waitKey(1) == ord('q'):
         stop_event.set()
         cv2.destroyAllWindows()
 
-def handle_sae_message(sae_message_bytes, stream_key,time_dict):
+def handle_sae_message(sae_message_bytes, stream_key):
     global previous_frame_timestamp, args
 
     sae_msg = SaeMessage()
@@ -82,18 +92,10 @@ def handle_sae_message(sae_message_bytes, stream_key,time_dict):
 
     log_line = f'E2E-Delay: {round(time.time() * 1000 - sae_msg.frame.timestamp_utc_ms): >8} ms, Display Frametime: {frametime: >5} ms'
     if sae_msg.HasField('metrics'):
-        log_line_detail = f', Detection: {sae_msg.metrics.detection_inference_time_us: >7} us, Feature_extraction: {sae_msg.metrics.feature_extraction_time_us: >7} us, Tracking: {sae_msg.metrics.tracking_inference_time_us: >7} us'
-        print(log_line_detail, file=sys.stderr)
-        time_dict['detection_time'].append(sae_msg.metrics.detection_inference_time_us)
-        time_dict['feature_extraction_time'].append(sae_msg.metrics.feature_extraction_time_us)
-        time_dict['tracking_time'].append(sae_msg.metrics.tracking_inference_time_us)
+        log_line += f', Detection: {sae_msg.metrics.detection_inference_time_us: >7} us, Tracking: {sae_msg.metrics.tracking_inference_time_us: >7} us'
     print(log_line, file=sys.stderr)
-    avg_log_line = f'average_detection_time:{average(time_dict["detection_time"]): >7} us, average_feature_extraction_time:{average(time_dict["feature_extraction_time"]): >7} us, average_tracking_time:{average(time_dict["tracking_time"]): >7} us'
-    print(avg_log_line, file=sys.stderr)
-    image = get_image(sae_msg)
 
-    if sae_msg.frame.frame_id is not None:
-        cv2.putText(image, f'Frame ID: {sae_msg.frame.frame_id}', (50, 100), fontFace=cv2.FONT_HERSHEY_SIMPLEX, color=(0, 0, 0), thickness=3, fontScale=3, lineType=cv2.LINE_AA)
+    image = get_image(sae_msg)
 
     for detection in sae_msg.detections:
         annotate(image, detection)
@@ -103,9 +105,6 @@ def handle_sae_message(sae_message_bytes, stream_key,time_dict):
     
     showImage(stream_key, image)
 
-    return image, time_dict
-    
-
 
 if __name__ == '__main__':
 
@@ -113,6 +112,10 @@ if __name__ == '__main__':
     arg_parser.add_argument('-s', '--stream', type=str)
     arg_parser.add_argument('-i', '--image-file', type=str, default=None)
     arg_parser.add_argument('-o', '--stdout', action='store_true', help='Output annotated raw frames to stdout (e.g. to pipe into ffmpeg)')
+    arg_parser.add_argument('-f', '--fixed-scale', type=float, 
+                           help='Display with fixed scaling factor and high-quality scaling (2=double size, 1=original size, 0.75=75%% size , 0.5=half size, etc.)')
+
+
     args = arg_parser.parse_args()
 
     if args.stdout and sys.stdout.isatty():
@@ -131,12 +134,6 @@ if __name__ == '__main__':
 
     consume = RedisConsumer(REDIS_HOST, REDIS_PORT, [STREAM_KEY], block=200)
 
-    # video_writer = cv2.VideoWriter('record.mp4', cv2.VideoWriter_fourcc(*'mp4v') , 10.0, (2560, 1440))
-    time_dict = {}
-    time_dict['detection_time'] = []
-    time_dict['feature_extraction_time'] = []
-    time_dict['tracking_time'] = []
-
     with consume:
         for stream_key, proto_data in consume():
             if stop_event.is_set():
@@ -145,6 +142,4 @@ if __name__ == '__main__':
             if stream_key is None:
                 continue
             
-            image,time_dict = handle_sae_message(proto_data, stream_key,time_dict)
-
-            # video_writer.write(image)
+            handle_sae_message(proto_data, stream_key)

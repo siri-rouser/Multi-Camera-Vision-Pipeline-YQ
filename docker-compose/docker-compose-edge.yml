@@ -1,0 +1,51 @@
+version: '3.8'
+services:
+  redis:
+    image: redis:7.0
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+    ports:
+      - 6379:6379
+    volumes:
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+    healthcheck:
+      test: "[ \"$(redis-cli ping)\" = \"PONG\" ] && exit 0 || exit 1"
+      interval: 1s
+      start_period: 5s
+
+  streaming-server:
+    image: bluenviron/mediamtx:latest-ffmpeg   # multi-arch tag
+    platform: "linux/arm64" # Specify the platform to ensure compatibility
+    volumes:
+      - ./streaming-server/mediamtx.yml:/mediamtx.yml
+      - ${VIDEO_PATH1}:/video1
+      # - /home/yuqiang/yl4300/Multi-Camera-Vision-Pipeline-YQ/carmel_data/RangelinePhelpsNB.mp4:/video1/RangelinePhelpsNB.mp4
+      # - /home/yuqiang/yl4300/Multi-Camera-Vision-Pipeline-YQ/carmel_data/RangelineElmSB.mp4:/video2/RangelineElmSB.mp4
+    environment:
+      MTX_PROTOCOLS: tcp
+    ports:
+      - 8554:8554
+
+  video-source-stream1:
+    image: sirirouser/video_source_py_arm64:latest
+    environment:
+      - VIDEO_SOURCE_PARALLELISM=2
+    volumes:
+      - ./video-source-py/video-source-stream1.settings.yaml:/code/settings.yaml
+      # - /home/yuqiang/yl4300/Multi-Camera-Vision-Pipeline-YQ/subpackages/video-source-py-YQ/points_NB.txt:/code/points_NB.txt
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  # object-detector:
+  #   image: mcvt_yq/object_detector_arm64:latest
+  #   environment:
+  #     - NVIDIA_VISIBLE_DEVICES=all    
+  #     - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+  #   runtime: nvidia  # Ensure NVIDIA runtime is used
+  #   volumes:
+  #     - ./object-detector/object-detector.settings.yaml:/code/settings.yaml  # Config file
+  #     - /home/yuqiang/yl4300/Multi-Camera-Vision-Pipeline-YQ/subpackages/object-detector-YQ/object-detector-YQ/yolo11l.engine:/code/yolo11l.engine  # Model file
+
+  #   depends_on:
+  #     redis:
+  #       condition: service_healthy

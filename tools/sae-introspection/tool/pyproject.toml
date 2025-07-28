@@ -1,0 +1,25 @@
+[project]
+name = "tool"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "yuqiang",email = "yl4300@bath.ac.uk"}
+]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+opencv-python = "^4.10"
+redis = "^5.0.0"
+visionapi_yq = {git = "https://github.com/siri-rouser/visionapi_YQ.git", rev= '7ea2ec0240dfb50f597c89d97c8e75872aa9204c', subdirectory="visionapi_YQ", tag = "0.0.1" }
+visionlib = { git = "https://github.com/siri-rouser/vision-lib-YQ.git", subdirectory = "python"}
+pydantic = "^2.0.0"
+simple-term-menu = "^1.6"
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+package-mode = false

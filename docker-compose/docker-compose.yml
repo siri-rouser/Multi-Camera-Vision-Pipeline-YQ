@@ -1,5 +1,4 @@
 version: '3.8'
-
 services:
   redis:
     image: redis:7.0
@@ -13,99 +12,46 @@ services:
       interval: 1s
       start_period: 5s
 
-  video-source-stream1:
-    image: ${IMAGE_REGISTRY}/sae-video-source-py:${VIDEO_SOURCE_VERSION}
-    volumes:
-      - ./video-source-py/video-source-stream1.settings.yaml:/code/settings.yaml
-    depends_on:
-      redis:
-        condition: service_healthy
-
-  video-source-stream2:
-    image: ${IMAGE_REGISTRY}/sae-video-source-py:${VIDEO_SOURCE_VERSION}
-    volumes:
-      - ./video-source-py/video-source-stream2.settings.yaml:/code/settings.yaml
-    depends_on:
-      redis:
-        condition: service_healthy
-
-  object-detector:
-    image: mcvt_yq/object_detector:latest
-    volumes:
-      - ./object-detector/object-detector.settings.yaml:/code/settings.yaml
-      - ./object-detector/weights/yolo11l.engine:/code/yolo11l.engine
-    depends_on:
-      redis:
-        condition: service_healthy
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
-                  
   streaming-server:
-    image: bluenviron/mediamtx:1.0.0-ffmpeg
+    image: bluenviron/mediamtx:latest-ffmpeg   # multi-arch tag
+    platform: "linux/arm64" # Specify the platform to ensure compatibility
     volumes:
       - ./streaming-server/mediamtx.yml:/mediamtx.yml
       - ${VIDEO_PATH1}:/video1
-      - ${VIDEO_PATH2}:/video2
+      # - /home/yuqiang/yl4300/Multi-Camera-Vision-Pipeline-YQ/carmel_data/RangelinePhelpsNB.mp4:/video1/RangelinePhelpsNB.mp4
+      # - /home/yuqiang/yl4300/Multi-Camera-Vision-Pipeline-YQ/carmel_data/RangelineElmSB.mp4:/video2/RangelineElmSB.mp4
     environment:
       MTX_PROTOCOLS: tcp
     ports:
       - 8554:8554
 
-  feature-extractor1:
-    image: mcvt_yq/feature_extractor_temp:latest
+  video-source-stream1:
+    image: sirirouser/video_source_py_arm64:v2.1
+    environment:
+      - VIDEO_SOURCE_PARALLELISM=2
     volumes:
-      - ./feature-extractor/feature-extractor1.settings.yaml:/code/settings.yaml
-    depends_on:
-      redis:
-        condition: service_healthy
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
-
-  feature-extractor2:
-    image: mcvt_yq/feature_extractor_temp:latest
-    volumes:
-      - ./feature-extractor/feature-extractor2.settings.yaml:/code/settings.yaml
-    depends_on:
-      redis:
-        condition: service_healthy
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
-
-
-  object-tracker-stream1:
-    image: mcvt_yq/object_tracker:latest
-    volumes:
-      - ./object-tracker/object-tracker-stream1.settings.yaml:/code/settings.yaml
+      - ./video-source-py/video-source-stream1.settings.yaml:/code/settings.yaml
+      - /home/yuqiang/yl4300/Multi-Camera-Vision-Pipeline-YQ/subpackages/video-source-py-YQ/points_NB.txt:/code/points_NB.txt
     depends_on:
       redis:
         condition: service_healthy
 
-  
-  object-tracker-stream2:
-    image: mcvt_yq/object_tracker:latest
+  object-detector:
+    image: mcvt_yq/object_detector_arm64:latest
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all    
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+    runtime: nvidia  # Ensure NVIDIA runtime is used
     volumes:
-      - ./object-tracker/object-tracker-stream2.settings.yaml:/code/settings.yaml
+      - ./object-detector/object-detector.settings.yaml:/code/settings.yaml  # Config file
+      - /home/yuqiang/yl4300/Multi-Camera-Vision-Pipeline-YQ/subpackages/object-detector-YQ/object-detector-YQ/yolo11l.engine:/code/yolo11l.engine  # Model file
+
     depends_on:
       redis:
         condition: service_healthy
-    
+
   geo-mapper:
-    image: mcvt_yq/geomapper:latest
+    image: mcvt_yq/geomapper_arm64:latest
     volumes:
       - ./geo-mapper/geo-mapper.settings.yaml:/code/settings.yaml
       - ./geo-mapper/cam_config/fitted_camNB.json:/code/fitted_cam_NB.json
@@ -113,4 +59,31 @@ services:
     depends_on:
       redis:
         condition: service_healthy
-    
+
+  feature_extractor1:
+    image: mcvt_yq/feature_extractor_arm64:latest
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all    
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+    runtime: nvidia  # Ensure NVIDIA runtime is used
+    volumes:
+      - ./feature-extractor/feature-extractor1.settings.yaml:/code/settings.yaml
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  object-tracker-stream1:
+    image: mcvt_yq/object_tracker_arm64:v1.0
+    volumes:
+      - ./object-tracker/object-tracker-stream1.settings.yaml:/code/settings.yaml
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  redis-writer:
+    image: mcvt_yq/redis_writer_arm64:latest
+    volumes:
+      - ./redis-writer/redis-writer.settings.yaml:/code/settings.yaml
+    depends_on:
+      redis:
+        condition: service_healthy

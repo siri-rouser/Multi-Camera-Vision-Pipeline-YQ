@@ -1,8 +1,11 @@
 paths:
   video-stream1:
-    runOnDemand: ffmpeg -re -stream_loop -1 -i /video1 -c copy -f rtsp rtsp://localhost:$RTSP_PORT/$MTX_PATH
+    runOnDemand: ffmpeg -re -i /video1 -c copy -f rtsp -rtsp_transport tcp -buffer_size 4096000 rtsp://localhost:$RTSP_PORT/$MTX_PATH
     runOnDemandRestart: yes
+    
+  # video-stream2:
+  #   runOnDemand: ffmpeg -re -stream_loop -1 -i /video2/RangelineElmSB.mp4 -c copy -f rtsp rtsp://localhost:$RTSP_PORT/$MTX_PATH
+  #   runOnDemandRestart: yes
 
-  video-stream2:
-    runOnDemand: ffmpeg -re -stream_loop -1 -i /video2 -c copy -f rtsp rtsp://localhost:$RTSP_PORT/$MTX_PATH
-    runOnDemandRestart: yes
+
+# ffmpeg -re -i /home/yuqiang/yl4300/Multi-Camera-Vision-Pipeline-YQ/carmel_data/cam04.mp4 -c copy -f rtsp rtsp://localhost:8554/video-stream1
