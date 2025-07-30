@@ -36,16 +36,24 @@ services:
       redis:
         condition: service_healthy
 
-  # object-detector:
-  #   image: mcvt_yq/object_detector_arm64:latest
-  #   environment:
-  #     - NVIDIA_VISIBLE_DEVICES=all    
-  #     - NVIDIA_DRIVER_CAPABILITIES=compute,utility
-  #   runtime: nvidia  # Ensure NVIDIA runtime is used
-  #   volumes:
-  #     - ./object-detector/object-detector.settings.yaml:/code/settings.yaml  # Config file
-  #     - /home/yuqiang/yl4300/Multi-Camera-Vision-Pipeline-YQ/subpackages/object-detector-YQ/object-detector-YQ/yolo11l.engine:/code/yolo11l.engine  # Model file
+  object-detector:
+    image: sirirouser/object_detector_arm64:latest
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all    
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+    runtime: nvidia  # Ensure NVIDIA runtime is used
+    volumes:
+      - ./object-detector/object-detector.settings.yaml:/code/settings.yaml  # Config file
+      - /home/yuqiang/yl4300/Multi-Camera-Vision-Pipeline-YQ/subpackages/object-detector-YQ/object-detector-YQ/yolo11m.engine:/code/yolo11m.engine  # NOTE: Regarding the engine file, try a different way to generate the TRT file, the yolov11l.engine looks better than other .engine file.
 
-  #   depends_on:
-  #     redis:
-  #       condition: service_healthy
+    depends_on:
+      redis:
+        condition: service_healthy
+  geo-mapper:
+    image: sirirouser/geomapper_arm64:latest
+    volumes:
+      - ./geo-mapper/geo-mapper.settings.yaml:/code/settings.yaml
+      - ./geo-mapper/cam_config/cam04_fitted_cam.json:/code/cam04.json
+    depends_on:
+      redis:
+        condition: service_healthy

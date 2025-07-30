@@ -1,14 +1,16 @@
 model:
-  weights_path: /code/yolo11l.engine
+  weights_path: /code/yolo11m.engine
   device: "cuda"
-  confidence_threshold: 0.25
-  iou_threshold: 0.45
+  confidence_threshold: 0.3
+  iou_threshold: 0.4
   nms_agnostic: TRUE
-  # fp16_quantization: TRUE
+  fp16_quantization: TRUE
 
 # for the inference img size, bigger should be better, for the previous MCMT WP, i am using [1280,1280] 
-inference_size: [ 1280, 720 ]
+inference_size: [ 1280, 736 ]
 classes: [ 2, 5, 7 ]
+max_batch_size: 1
+max_batch_interval: 0
 motion_detect: False
 motion_threshold: 300
 log_level: DEBUG

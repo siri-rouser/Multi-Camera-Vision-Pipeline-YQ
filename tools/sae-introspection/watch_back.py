@@ -50,7 +50,7 @@ def annotate(image, detection: Detection):
     label = f'{class_id} - {round(conf,2)}'
 
     if detection.object_id is not None:
-        object_id = detection.object_id.hex()[:4]
+        object_id = detection.object_id
         label = f'ID {object_id} - {class_id} - {round(conf,2)}'
 
     line_width = max(round(sum(image.shape) / 2 * 0.002), 2)

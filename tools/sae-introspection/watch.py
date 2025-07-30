@@ -113,6 +113,7 @@ if __name__ == '__main__':
     arg_parser.add_argument('-s', '--stream', type=str)
     arg_parser.add_argument('-i', '--image-file', type=str, default=None)
     arg_parser.add_argument('-o', '--stdout', action='store_true', help='Output annotated raw frames to stdout (e.g. to pipe into ffmpeg)')
+    arg_parser.add_argument('--record', action='store_true', help='Record annotated video to file (record.mp4)')
     args = arg_parser.parse_args()
 
     if args.stdout and sys.stdout.isatty():
@@ -131,7 +132,8 @@ if __name__ == '__main__':
 
     consume = RedisConsumer(REDIS_HOST, REDIS_PORT, [STREAM_KEY], block=200)
 
-    # video_writer = cv2.VideoWriter('record.mp4', cv2.VideoWriter_fourcc(*'mp4v') , 10.0, (2560, 1440))
+    # video_writer = None
+
     time_dict = {}
     time_dict['detection_time'] = []
     time_dict['feature_extraction_time'] = []
@@ -145,6 +147,11 @@ if __name__ == '__main__':
             if stream_key is None:
                 continue
             
-            image,time_dict = handle_sae_message(proto_data, stream_key,time_dict)
+            image, time_dict = handle_sae_message(proto_data, stream_key, time_dict)
 
-            # video_writer.write(image)
+            # if args.record and video_writer is None:
+            #     height, width = image.shape[:2]
+            #     video_writer = cv2.VideoWriter('record.mp4', cv2.VideoWriter_fourcc(*'mp4v'), 15.0, (width, height))
+
+            # if args.record and video_writer is not None:
+            #     video_writer.write(image)
