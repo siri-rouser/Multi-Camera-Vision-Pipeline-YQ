@@ -26,3 +26,5 @@ log_level: INFO
 redis:
   host: redis
   port: 6379
+  input_stream_prefix: objecttracker
+  output_stream_prefix: geomapper

@@ -18,8 +18,6 @@ services:
     volumes:
       - ./streaming-server/mediamtx.yml:/mediamtx.yml
       - ${VIDEO_PATH1}:/video1
-      # - /home/yuqiang/yl4300/Multi-Camera-Vision-Pipeline-YQ/carmel_data/RangelinePhelpsNB.mp4:/video1/RangelinePhelpsNB.mp4
-      # - /home/yuqiang/yl4300/Multi-Camera-Vision-Pipeline-YQ/carmel_data/RangelineElmSB.mp4:/video2/RangelineElmSB.mp4
     environment:
       MTX_PROTOCOLS: tcp
     ports:
@@ -31,7 +29,6 @@ services:
       - VIDEO_SOURCE_PARALLELISM=2
     volumes:
       - ./video-source-py/video-source-stream1.settings.yaml:/code/settings.yaml
-      # - /home/yuqiang/yl4300/Multi-Camera-Vision-Pipeline-YQ/subpackages/video-source-py-YQ/points_NB.txt:/code/points_NB.txt
     depends_on:
       redis:
         condition: service_healthy
@@ -44,16 +41,41 @@ services:
     runtime: nvidia  # Ensure NVIDIA runtime is used
     volumes:
       - ./object-detector/object-detector.settings.yaml:/code/settings.yaml  # Config file
-      - /home/yuqiang/yl4300/Multi-Camera-Vision-Pipeline-YQ/subpackages/object-detector-YQ/object-detector-YQ/yolo11m.engine:/code/yolo11m.engine  # NOTE: Regarding the engine file, try a different way to generate the TRT file, the yolov11l.engine looks better than other .engine file.
+      - /home/yuqiang/yl4300/Multi-Camera-Vision-Pipeline-YQ/subpackages/object-detector-YQ/object-detector-YQ/yolo11m_cuda.engine:/code/yolo11m.engine  # NOTE: Regarding the engine file, try a different way to generate the TRT file, the yolov11l.engine looks better than other .engine file.
 
     depends_on:
       redis:
         condition: service_healthy
+
+  object-tracker-stream1:
+    image: sirirouser/object_tracker_arm64:latest
+    volumes:
+      - ./object-tracker/object-tracker-stream1.settings.yaml:/code/settings.yaml
+      - ./object-tracker/tracking_config/bytetrack.yaml:/code/tracking_config/bytetrack.yaml
+      - ./object-tracker/reid_weights/clip_vehicleid.pt:/code/clip_vehicleid.pt
+    depends_on:
+      redis:
+        condition: service_healthy
+
   geo-mapper:
     image: sirirouser/geomapper_arm64:latest
     volumes:
       - ./geo-mapper/geo-mapper.settings.yaml:/code/settings.yaml
       - ./geo-mapper/cam_config/cam04_fitted_cam.json:/code/cam04.json
+    depends_on:
+      redis:
+        condition: service_healthy
+  
+  feature_extractor1:
+    image: sirirouser/feature_extractor_arm64:latest
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all    
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+    runtime: nvidia  # Ensure NVIDIA runtime is used
+    volumes:
+      - ./feature-extractor/feature-extractor1.settings.yaml:/code/settings.yaml
+      - ./feature-extractor/model_config/model_config.yaml:/code/model_config.yaml
+      - ./feature-extractor/model_config/sbs_model.pth:/code/sbs_model.pth
     depends_on:
       redis:
         condition: service_healthy

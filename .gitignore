@@ -2,3 +2,7 @@ carmel_data/
 *.mp4
 subpackages/TensorRT
 /ultralytics
+*.pt
+*.pth
+*.onnx
+*.weights
