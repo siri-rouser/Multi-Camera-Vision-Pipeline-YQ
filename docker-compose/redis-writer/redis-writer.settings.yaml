@@ -3,7 +3,7 @@ remove_frame_data: false
 redis:
   host: redis
   port: 6379
-  input_stream_prefix: objecttracker
+  input_stream_prefix: featureextractor
 target_redis:
   host: 192.168.55.100
   port: 6379

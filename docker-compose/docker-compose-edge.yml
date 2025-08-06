@@ -62,6 +62,7 @@ services:
     volumes:
       - ./geo-mapper/geo-mapper.settings.yaml:/code/settings.yaml
       - ./geo-mapper/cam_config/cam04_fitted_cam.json:/code/cam04.json
+      - ./geo-mapper/cam_config/cam03_fitted_cam.json:/code/cam03.json
     depends_on:
       redis:
         condition: service_healthy
@@ -76,6 +77,14 @@ services:
       - ./feature-extractor/feature-extractor1.settings.yaml:/code/settings.yaml
       - ./feature-extractor/model_config/model_config.yaml:/code/model_config.yaml
       - ./feature-extractor/model_config/sbs_model.pth:/code/sbs_model.pth
+    depends_on:
+      redis:
+        condition: service_healthy
+  
+  redis-writer:
+    image: sirirouser/redis_writer_arm64:latest
+    volumes:
+      - ./redis-writer/redis-writer.settings.yaml:/code/settings.yaml
     depends_on:
       redis:
         condition: service_healthy

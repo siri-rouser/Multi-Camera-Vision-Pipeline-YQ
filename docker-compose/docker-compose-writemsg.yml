@@ -1,0 +1,23 @@
+version: '3.8'
+services:
+  redis:
+    image: redis:7.0
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+    ports:
+      - 6379:6379
+    volumes:
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+    healthcheck:
+      test: "[ \"$(redis-cli ping)\" = \"PONG\" ] && exit 0 || exit 1"
+      interval: 1s
+      start_period: 5s
+
+  local-sae-writer:
+    image: sirirouser/local_sae_writer_arm64:latest
+    volumes:
+      - ./local-sae-writer/local-sae-writer.settings.yaml:/code/settings.yaml
+      - ./local-sae-writer/saedumps/cam04.saedump:/code/cam04.saedump
+      - ./local-sae-writer/saedumps/cam03.saedump:/code/cam03.saedump
+    depends_on:
+      redis:
+        condition: service_healthy

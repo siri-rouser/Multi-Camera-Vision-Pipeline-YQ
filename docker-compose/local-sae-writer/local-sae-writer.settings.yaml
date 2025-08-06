@@ -1,0 +1,22 @@
+log_level: DEBUG
+remove_frame_data: false
+redis:
+  host: localhost
+  port: 6379
+  input_stream_prefix: featureextractor
+target_redis:
+  host: 192.168.55.100
+  port: 6379
+  output_stream_prefix: JetsonOrin
+  buffer_length: 10                   # How many messages the internal ring buffer will hold before discarding old messages
+  target_stream_maxlen: 100           # maxlen for redis XADD (Redis will delete oldest messages from stream to stay within maxlen)
+  tls: false                          # Whether to use mutual TLS for communication. See README for details on how to configure.
+stream_ids: 
+  - stream1
+  - stream3
+
+saedump_files:
+  - /code/cam04.saedump
+  - /code/cam03.saedump
+
+adjust_timestamp: True

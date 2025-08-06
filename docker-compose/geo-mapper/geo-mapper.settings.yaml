@@ -1,5 +1,5 @@
 cameras:
-  - stream_id: stream1
+  - stream_id: stream4
     cam_config_path: '/code/cam04.json'
     passthrough: false          # If the stream should be passed through without geo mapping (all other parameters are ignored if true)
     # mapping_area:               # Must be a geojson `Polygon`. If set, only detections within that polygon will be mapped (i.e. will have coordinates set)
@@ -9,15 +9,9 @@ cameras:
     #     ]]
     # remove_unmapped_detections: false # If unmapped detections should be removed (i.e. detections filtered by mapping_area, see above)
 
-  # - stream_id: stream2
-  #   cam_config_path: '/code/fitted_camSB.json'
-  #   passthrough: false          # If the stream should be passed through without geo mapping (all other parameters are ignored if true)
-    # mapping_area:               # Must be a geojson `Polygon`. If set, only detections within that polygon will be mapped (i.e. will have coordinates set)
-    #   type: Polygon
-    #   coordinates: [[           # [lon, lat] format. The last point must equal the first!
-    #       [10, 50],
-    #     ]]
-    # remove_unmapped_detections: false # If unmapped detections should be removed (i.e. detections filtered by mapping_area, see above)
+  - stream_id: stream3
+    cam_config_path: '/code/cam03.json'
+    passthrough: false          # If the stream should be passed through without geo mapping (all other parameters are ignored if true)
 
 
 object_center_elevation_m: 0.5

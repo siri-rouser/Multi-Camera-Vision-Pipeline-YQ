@@ -1,4 +1,4 @@
-id: stream1
+id: stream3
 uri: rtsp://streaming-server:8554/video-stream1
 mask: False
 mask_polygon_location: None
