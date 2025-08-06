@@ -7,10 +7,8 @@ import redis
 from turbojpeg import TurboJPEG
 from visionapi_yq.messages_pb2 import SaeMessage
 from visionlib.pipeline.consumer import RedisConsumer
-from visionlib.pipeline.tools import get_raw_frame_data,MESSAGE_SEPARATOR, DumpMeta, Event, EventMeta
-
-
-# from visionlib.pipeline.saedump import MESSAGE_SEPARATOR, DumpMeta, Event, EventMeta
+from visionlib.pipeline.tools import get_raw_frame_data
+from visionlib.saedump import MESSAGE_SEPARATOR, DumpMeta, Event, EventMeta
 
 from common import choose_streams, default_arg_parser, register_stop_handler
 
@@ -72,8 +70,8 @@ if __name__ == '__main__':
 
     arg_parser = default_arg_parser()
     arg_parser.add_argument('-s', '--streams', type=str, nargs='*', metavar='STREAM')
-    arg_parser.add_argument('-o', '--output-file', type=str, default=f'./{time.strftime("%Y-%m-%dT%H-%M-%S%z")}.saedump')
-    arg_parser.add_argument('-t', '--time-limit', type=int, help='Stop recording after TIME_LIMIT seconds (default 60)', default=60)
+    # arg_parser.add_argument('-o', '--output-file', type=str, default=f'./record_saedump/{time.strftime("%Y-%m-%dT%H-%M-%S%z")}.saedump')
+    arg_parser.add_argument('-t', '--time-limit', type=int, help='Stop recording after TIME_LIMIT seconds (default 60)', default=600)
     arg_parser.add_argument('-r', '--remove-frame', action='store_true', help='Remove frame data from messages (reduces size significantly)')
     arg_parser.add_argument('-d', '--downscale-frames', default=0, type=int, help='Downscale frames to given width (preserving aspect ratio)')
     arg_parser.add_argument('-q', '--downscale-jpeg-quality', default=85, type=int, help='JPEG quality for downscaling frames (0-100, sane values 80-95)')
@@ -87,7 +85,9 @@ if __name__ == '__main__':
         redis_client = redis.Redis(REDIS_HOST, REDIS_PORT)
         STREAM_KEYS = choose_streams(redis_client)
 
-    print(f'Recording streams {STREAM_KEYS} for {args.time_limit}s into {args.output_file}')
+    output_file = f'./record_saedump/{STREAM_KEYS}.saedump'
+
+    print(f'Recording streams {STREAM_KEYS} for {args.time_limit}s into {output_file}')
 
     stop_event = register_stop_handler()
 
@@ -95,8 +95,7 @@ if __name__ == '__main__':
 
     start_time = time.time()
 
-
-    with consume, open(args.output_file, 'x') as output_file:
+    with consume, open(output_file, 'x') as output_file:
         
         write_meta(output_file, start_time, STREAM_KEYS)
 
