@@ -1,33 +1,12 @@
-# tracker_algorithm: DEEPSORT
-# tracker_config:
-#     max_cosine_distance: 0.2
-#     min_confidence: 0.5
-#     max_iou_distance: 0.7
-#     max_age: 30
-#     n_init: 3 # change in DeepSort, it is meaningless to setup this value in here. 
-#     multi_camera_tracking: TRUE
-
-
-tracker_algorithm: SMILETRACK
-tracker_config:
-  min_confidence: 0.45
-  multi_camera_tracking: TRUE
-  track_low_thresh: 0.45
-  track_high_thresh: 0.5
-  new_track_thresh: 0.6
-  track_buffer: 30
-  proximity_thresh: 0.5
-  appearance_thresh: 0.25
-  with_reid: False
-  match_thresh: 0.8
-  frame_rate: 13
-
-
+tracker_algorithm: bytetrack
+tracker_algorithm_config_path: '/code/tracking_config/bytetrack.yaml'
+track_reid: False
+track_reid_weights: /code/clip_vehicleid.pt  # Path to the reid weights file
 log_level: DEBUG
 
 redis:
-  host: redis  # Updated to point to localhost
+  host: redis # Updated to point to localhost
   port: 6379
   stream_id: stream2
-  input_stream_prefix: featureextractor
+  input_stream_prefix: objectdetector
   output_stream_prefix: objecttracker

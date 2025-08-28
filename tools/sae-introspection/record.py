@@ -14,6 +14,7 @@ from common import choose_streams, default_arg_parser, register_stop_handler
 
 jpeg = TurboJPEG()
 
+# NOTE: This version starts recording the file only if it received the first frame.
 
 def write_meta(file: TextIO, start_time: float, stream_keys: list[str]):
     meta = DumpMeta(
@@ -69,9 +70,9 @@ def resize_frame(proto_data, scale_width=0, quality=85):
 if __name__ == '__main__':
 
     arg_parser = default_arg_parser()
-    arg_parser.add_argument('-s', '--streams', type=str, nargs='*', metavar='STREAM')
+    arg_parser.add_argument("-s", "--streams", type=str, nargs="*", metavar="STREAM")
     # arg_parser.add_argument('-o', '--output-file', type=str, default=f'./record_saedump/{time.strftime("%Y-%m-%dT%H-%M-%S%z")}.saedump')
-    arg_parser.add_argument('-t', '--time-limit', type=int, help='Stop recording after TIME_LIMIT seconds (default 60)', default=600)
+    arg_parser.add_argument('-t', '--time-limit', type=int, help='Stop recording after TIME_LIMIT seconds (default 60)', default=650)
     arg_parser.add_argument('-r', '--remove-frame', action='store_true', help='Remove frame data from messages (reduces size significantly)')
     arg_parser.add_argument('-d', '--downscale-frames', default=0, type=int, help='Downscale frames to given width (preserving aspect ratio)')
     arg_parser.add_argument('-q', '--downscale-jpeg-quality', default=85, type=int, help='JPEG quality for downscaling frames (0-100, sane values 80-95)')
@@ -85,9 +86,12 @@ if __name__ == '__main__':
         redis_client = redis.Redis(REDIS_HOST, REDIS_PORT)
         STREAM_KEYS = choose_streams(redis_client)
 
-    output_file = f'./record_saedump/{STREAM_KEYS}.saedump'
 
-    print(f'Recording streams {STREAM_KEYS} for {args.time_limit}s into {output_file}')
+    output_file = f'/home/yuqiang/yl4300/Multi-Camera-Vision-Pipeline-YQ/tools/sae-introspection/record_saedump/{STREAM_KEYS[0]}.saedump'
+
+    print(f"Will record stream(s): {STREAM_KEYS}")
+    print(f"Output: {output_file}")
+    print(f"Time limit (from first message): {args.time_limit}s")
 
     stop_event = register_stop_handler()
 
@@ -95,19 +99,41 @@ if __name__ == '__main__':
 
     start_time = time.time()
 
-    with consume, open(output_file, 'x') as output_file:
-        
-        write_meta(output_file, start_time, STREAM_KEYS)
+    # Lazy-open file and start timer ONLY after the first real message arrives
+    started = False
+    start_time = None
+    output_file_handle = None
+    
+    try:
+        with consume:
+            for stream_key, proto_data in consume():
+                if stop_event.is_set(): 
+                    break
 
-        for stream_key, proto_data in consume():
-            if stop_event.is_set(): 
-                break
+                if stream_key is None or proto_data is None:
+                    continue
+                
+                if not started:
+                    started = True
+                    start_time = time.time()
+                    # create file on first data to avoid empty dumps
+                    output_file_handle = open(output_file, "x")
+                    write_meta(output_file_handle, start_time, STREAM_KEYS)
+                    print("First message received — recording started.")
 
-            if stream_key is None:
-                continue
+                if time.time() - start_time > args.time_limit:
+                    print(f'Reached configured time limit of {args.time_limit}s')
+                    break
 
-            if time.time() - start_time > args.time_limit:
-                print(f'Reached configured time limit of {args.time_limit}s')
-                break
+                write_event(
+                    output_file_handle,
+                    stream_key,
+                    proto_data,
+                    is_remove_frame=args.remove_frame,
+                    scale_width=args.downscale_frames,
+                    scale_quality=args.downscale_jpeg_quality,
+                )
 
-            write_event(output_file, stream_key, proto_data, is_remove_frame=False, scale_width=0, scale_quality=85)
+    finally:
+        if output_file_handle:
+            output_file_handle.close()

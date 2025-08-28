@@ -16,7 +16,9 @@ stream_ids:
   - stream3
 
 saedump_files:
-  # - /code/cam04.saedump
-  - /code/cam03_back.saedump
+  - /code/cam04.saedump
+  - /code/cam03.saedump
+  - /code/cam02.saedump
+  - /code/cam01.saedump
 
 adjust_timestamp: True

@@ -18,5 +18,4 @@ redis:
   host: redis
   port: 6379
   stream_ids: 
-    - stream3
-    # - stream2 
+    - stream4

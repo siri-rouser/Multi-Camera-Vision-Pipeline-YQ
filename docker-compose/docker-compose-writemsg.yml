@@ -16,8 +16,10 @@ services:
     image: sirirouser/local_sae_writer_arm64:latest
     volumes:
       - ./local-sae-writer/local-sae-writer.settings.yaml:/code/settings.yaml
+      - ./local-sae-writer/saedumps/cam01.saedump:/code/cam01.saedump
+      - ./local-sae-writer/saedumps/cam02.saedump:/code/cam02.saedump
+      - ./local-sae-writer/saedumps/cam03.saedump:/code/cam03.saedump
       - ./local-sae-writer/saedumps/cam04.saedump:/code/cam04.saedump
-      - ./local-sae-writer/saedumps/cam03_back.saedump:/code/cam03_back.saedump
     depends_on:
       redis:
         condition: service_healthy

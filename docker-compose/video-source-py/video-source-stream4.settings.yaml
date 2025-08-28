@@ -1,5 +1,5 @@
-id: stream2
-video_path: /code/cam02_2k_15fps.mp4
+id: stream4
+video_path: /code/cam04_2k_15fps.mp4
 max_fps: 15
 stop_after_frames: 9000
 jpeg_encode: True

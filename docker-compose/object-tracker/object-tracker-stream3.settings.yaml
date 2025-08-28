@@ -7,6 +7,6 @@ log_level: DEBUG
 redis:
   host: redis # Updated to point to localhost
   port: 6379
-  stream_id: stream1
+  stream_id: stream3
   input_stream_prefix: objectdetector
   output_stream_prefix: objecttracker
