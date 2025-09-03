@@ -1,11 +1,13 @@
 import time
 from typing import TextIO
-
+import threading
+import queue
 import cv2
+import os
 import pybase64
 import redis
 from turbojpeg import TurboJPEG
-from visionapi_yq.messages_pb2 import SaeMessage
+from visionapi_yq.messages_pb2 import SaeMessage, Detection
 from visionlib.pipeline.consumer import RedisConsumer
 from visionlib.pipeline.tools import get_raw_frame_data
 from visionlib.saedump import MESSAGE_SEPARATOR, DumpMeta, Event, EventMeta
@@ -13,8 +15,29 @@ from visionlib.saedump import MESSAGE_SEPARATOR, DumpMeta, Event, EventMeta
 from common import choose_streams, default_arg_parser, register_stop_handler
 
 jpeg = TurboJPEG()
+ANNOTATION_COLOR = (0, 0, 255)
 
 # NOTE: This version starts recording the file only if it received the first frame.
+
+def annotate(image, detection: Detection):
+    bbox_x1 = int(detection.bounding_box.min_x * image.shape[1])
+    bbox_y1 = int(detection.bounding_box.min_y * image.shape[0])
+    bbox_x2 = int(detection.bounding_box.max_x * image.shape[1])
+    bbox_y2 = int(detection.bounding_box.max_y * image.shape[0])
+
+    class_id = detection.class_id
+    conf = detection.confidence
+
+    label = f'{class_id} - {round(conf,2)}'
+
+    if detection.object_id is not None:
+        object_id = detection.object_id
+        label = f'ID {object_id} - {class_id} - {round(conf,2)}'
+
+    line_width = max(round(sum(image.shape) / 2 * 0.002), 2)
+
+    cv2.rectangle(image, (bbox_x1, bbox_y1), (bbox_x2, bbox_y2), color=ANNOTATION_COLOR, thickness=line_width, lineType=cv2.LINE_AA)
+    cv2.putText(image, label, (bbox_x1, bbox_y1 - 10), fontFace=cv2.FONT_HERSHEY_SIMPLEX, color=ANNOTATION_COLOR, thickness=round(line_width/3), fontScale=line_width/4, lineType=cv2.LINE_AA)
 
 def write_meta(file: TextIO, start_time: float, stream_keys: list[str]):
     meta = DumpMeta(
@@ -24,14 +47,18 @@ def write_meta(file: TextIO, start_time: float, stream_keys: list[str]):
     file.write(meta.model_dump_json())
     file.write(MESSAGE_SEPARATOR)
 
-def write_event(file: TextIO, stream_key: str, proto_data, is_remove_frame=False, scale_width=0, scale_quality=85):
+def write_event(file: TextIO, stream_key: str, proto_data, is_remove_frame=False, is_record_video=False, scale_width=0, scale_quality=85, out=None):
     bytes_to_write = proto_data
+
+    if is_record_video and out is not None:
+        record_video(proto_data, out)
     
     if is_remove_frame:
         bytes_to_write = remove_frame(proto_data)
 
     if scale_width > 0:
         bytes_to_write = resize_frame(proto_data, scale_width, scale_quality)
+
     
     event = Event(
         meta=EventMeta(
@@ -66,7 +93,20 @@ def resize_frame(proto_data, scale_width=0, quality=85):
     
     return msg.SerializeToString()
 
-    
+def record_video(proto_data, out):
+    msg = SaeMessage()
+    msg.ParseFromString(proto_data)
+    frame = get_raw_frame_data(msg.frame)
+    # Implement video recording logic here
+    if msg.frame.frame_id is not None:
+        cv2.putText(frame, f'Frame ID: {msg.frame.frame_id}', (50, 100), fontFace=cv2.FONT_HERSHEY_SIMPLEX, color=(0, 0, 0), thickness=3, fontScale=3, lineType=cv2.LINE_AA)
+
+    for detection in msg.detections:
+        annotate(frame, detection)
+
+    # Implement video recording logic here
+    out.write(frame)
+
 if __name__ == '__main__':
 
     arg_parser = default_arg_parser()
@@ -76,6 +116,7 @@ if __name__ == '__main__':
     arg_parser.add_argument('-r', '--remove-frame', action='store_true', help='Remove frame data from messages (reduces size significantly)')
     arg_parser.add_argument('-d', '--downscale-frames', default=0, type=int, help='Downscale frames to given width (preserving aspect ratio)')
     arg_parser.add_argument('-q', '--downscale-jpeg-quality', default=85, type=int, help='JPEG quality for downscaling frames (0-100, sane values 80-95)')
+    arg_parser.add_argument('-v', '--record-video', action='store_true', help='Record video output')
     args = arg_parser.parse_args()
 
     STREAM_KEYS = args.streams
@@ -86,11 +127,18 @@ if __name__ == '__main__':
         redis_client = redis.Redis(REDIS_HOST, REDIS_PORT)
         STREAM_KEYS = choose_streams(redis_client)
 
+    os.makedirs('/home/yuqiang/yl4300/Multi-Camera-Vision-Pipeline-YQ/tools/sae-introspection/record_saedump', exist_ok=True)
+    os.makedirs('/home/yuqiang/yl4300/Multi-Camera-Vision-Pipeline-YQ/tools/sae-introspection/record_video', exist_ok=True)
+
 
     output_file = f'/home/yuqiang/yl4300/Multi-Camera-Vision-Pipeline-YQ/tools/sae-introspection/record_saedump/{STREAM_KEYS[0]}.saedump'
+    output_video_file = f'/home/yuqiang/yl4300/Multi-Camera-Vision-Pipeline-YQ/tools/sae-introspection/record_video/{STREAM_KEYS[0]}.avi'
+    out = None  # Will be initialized after first frame if needed
 
     print(f"Will record stream(s): {STREAM_KEYS}")
     print(f"Output: {output_file}")
+    if args.record_video:
+        print(f"Video Output: {output_video_file}")
     print(f"Time limit (from first message): {args.time_limit}s")
 
     stop_event = register_stop_handler()
@@ -112,7 +160,6 @@ if __name__ == '__main__':
 
                 if stream_key is None or proto_data is None:
                     continue
-                
                 if not started:
                     started = True
                     start_time = time.time()
@@ -120,6 +167,20 @@ if __name__ == '__main__':
                     output_file_handle = open(output_file, "x")
                     write_meta(output_file_handle, start_time, STREAM_KEYS)
                     print("First message received — recording started.")
+
+                    # Initialize VideoWriter after getting first frame size
+                    if args.record_video:
+                        from visionapi_yq.messages_pb2 import SaeMessage
+                        msg = SaeMessage()
+                        msg.ParseFromString(proto_data)
+                        frame = get_raw_frame_data(msg.frame)
+                        height, width = frame.shape[:2]
+                        out = cv2.VideoWriter(
+                            output_video_file,
+                            cv2.VideoWriter_fourcc(*"XVID"),
+                            15.0,
+                            (width, height)
+                        )
 
                 if time.time() - start_time > args.time_limit:
                     print(f'Reached configured time limit of {args.time_limit}s')
@@ -130,8 +191,10 @@ if __name__ == '__main__':
                     stream_key,
                     proto_data,
                     is_remove_frame=args.remove_frame,
+                    is_record_video=args.record_video,
                     scale_width=args.downscale_frames,
                     scale_quality=args.downscale_jpeg_quality,
+                    out=out if args.record_video else None,
                 )
 
     finally:
