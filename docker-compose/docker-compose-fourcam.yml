@@ -13,19 +13,19 @@ services:
       interval: 1s
       start_period: 5s
 
-  streaming-server:
-    image: bluenviron/mediamtx:1.0.0-ffmpeg
-    # image: bluenviron/mediamtx:latest-ffmpeg
-    volumes:
-      - ./streaming-server/mediamtx.yml:/mediamtx.yml
-      - ${VIDEO_PATH1}:/video1
-      - ${VIDEO_PATH2}:/video2
-      - ${VIDEO_PATH3}:/video3
-      - ${VIDEO_PATH4}:/video4
-    environment:
-      MTX_PROTOCOLS: tcp
-    ports:
-      - 8554:8554
+  # streaming-server:
+  #   image: bluenviron/mediamtx:1.0.0-ffmpeg
+  #   # image: bluenviron/mediamtx:latest-ffmpeg
+  #   volumes:
+  #     - ./streaming-server/mediamtx.yml:/mediamtx.yml
+  #     - ${VIDEO_PATH1}:/video1
+  #     - ${VIDEO_PATH2}:/video2
+  #     - ${VIDEO_PATH3}:/video3
+  #     - ${VIDEO_PATH4}:/video4
+  #   environment:
+  #     MTX_PROTOCOLS: tcp
+  #   ports:
+  #     - 8554:8554
 
   # video-source-stream1:
   #   image: sirirouser/video_source_py:v3.1
@@ -53,14 +53,14 @@ services:
   #     redis:
   #       condition: service_healthy
 
-  video-source-stream4:
-    image: sirirouser/video_source_py:v3.1
-    volumes:
-      - ./video-source-py/video-source-stream4.settings.yaml:/code/settings.yaml
-      - ./video-source-py/points_SB.txt:/code/points_SB.txt
-    depends_on:
-      redis:
-        condition: service_healthy
+  # video-source-stream4:
+  #   image: sirirouser/video_source_py:v3.1
+  #   volumes:
+  #     - ./video-source-py/video-source-stream4.settings.yaml:/code/settings.yaml
+  #     - ./video-source-py/points_SB.txt:/code/points_SB.txt
+  #   depends_on:
+  #     redis:
+  #       condition: service_healthy
         
   # object-detector:
   #   image: sirirouser/object_detector:v3.0
