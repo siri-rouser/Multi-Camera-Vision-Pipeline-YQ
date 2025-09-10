@@ -7,8 +7,12 @@ tracklet_database:
   searching_time: 3000
   lost_time: 3000
 
+max_queue_size: 64
+sampling_rate: 5
+last_frame_id: 8999
+
 frame_info: False # to define if the frame info should be included in the output message
-log_level: DEBUG
+log_level: INFO
 redis:
   host: redis
   port: 6379

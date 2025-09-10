@@ -20,6 +20,13 @@ docker compose -f "$FILE" up -d "video-source-stream${X}"
 sleep 1
 
 echo "Launching recorder for featureextractor:stream${X} (time limit ${TIME_LIMIT}s)..."
-python3 ../tools/sae-introspection/record.py \
+
+# Start both recorders in background; capture PIDs
+python3 ../tools/sae-introspection/record_thread.py \
   --streams "featureextractor:stream${X}" \
-  --time-limit "$TIME_LIMIT"
+  --time-limit "$TIME_LIMIT" &
+
+python3 ../tools/sae-introspection/record.py \
+  --streams "geomapper:stream${X}" \
+  --record-video \
+  --time-limit "$TIME_LIMIT" &

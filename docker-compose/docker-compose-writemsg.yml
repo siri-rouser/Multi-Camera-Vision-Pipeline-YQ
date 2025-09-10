@@ -12,13 +12,37 @@ services:
       interval: 1s
       start_period: 5s
 
-  local-sae-writer:
+  local-sae-writer1:
     image: sirirouser/local_sae_writer_arm64:latest
     volumes:
-      - ./local-sae-writer/local-sae-writer.settings.yaml:/code/settings.yaml
+      - ./local-sae-writer/local-sae-writer1.settings.yaml:/code/settings.yaml
       - ./local-sae-writer/saedumps/cam01.saedump:/code/cam01.saedump
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  local-sae-writer2:
+    image: sirirouser/local_sae_writer_arm64:latest
+    volumes:
+      - ./local-sae-writer/local-sae-writer2.settings.yaml:/code/settings.yaml
       - ./local-sae-writer/saedumps/cam02.saedump:/code/cam02.saedump
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  local-sae-writer3:
+    image: sirirouser/local_sae_writer_arm64:latest
+    volumes:
+      - ./local-sae-writer/local-sae-writer3.settings.yaml:/code/settings.yaml
       - ./local-sae-writer/saedumps/cam03.saedump:/code/cam03.saedump
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  local-sae-writer4:
+    image: sirirouser/local_sae_writer_arm64:latest
+    volumes:
+      - ./local-sae-writer/local-sae-writer4.settings.yaml:/code/settings.yaml
       - ./local-sae-writer/saedumps/cam04.saedump:/code/cam04.saedump
     depends_on:
       redis:

@@ -42,7 +42,7 @@ services:
     runtime: nvidia  # Ensure NVIDIA runtime is used
     volumes:
       - ./object-detector/object-detector3.settings.yaml:/code/settings.yaml  # Config file
-      - /home/yuqiang/yl4300/Multi-Camera-Vision-Pipeline-YQ/subpackages/object-detector-YQ/object-detector-YQ/yolo11m_cuda.engine:/code/yolo11m.engine  # NOTE: Regarding the engine file, try a different way to generate the TRT file, the yolov11l.engine looks better than other .engine file.
+      - /home/yuqiang/yl4300/Multi-Camera-Vision-Pipeline-YQ/subpackages/object-detector-YQ/object-detector-YQ/yolo11l.engine:/code/yolo11l.engine  # NOTE: Regarding the engine file, try a different way to generate the TRT file, the yolov11l.engine looks better than other .engine file.
 
     depends_on:
       redis:
@@ -68,7 +68,7 @@ services:
         condition: service_healthy
   
   feature_extractor3:
-    image: sirirouser/feature_extractor_arm64:latest
+    image: sirirouser/feature_extractor_arm64:thread
     environment:
       - NVIDIA_VISIBLE_DEVICES=all    
       - NVIDIA_DRIVER_CAPABILITIES=compute,utility

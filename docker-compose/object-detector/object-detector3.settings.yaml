@@ -1,5 +1,5 @@
 model:
-  weights_path: /code/yolo11m.engine
+  weights_path: /code/yolo11l.engine
   device: "cuda"
   confidence_threshold: 0.3
   iou_threshold: 0.4
@@ -13,7 +13,7 @@ max_batch_size: 1
 max_batch_interval: 0
 motion_detect: False
 motion_threshold: 300
-log_level: DEBUG
+log_level: WARNING
 redis:
   host: redis
   port: 6379
