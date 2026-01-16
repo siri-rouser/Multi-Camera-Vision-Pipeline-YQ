@@ -1,0 +1,23 @@
+{
+    "gps_lat": 39.92698399304185,
+    "gps_lon": -86.10619797112649,
+    "focallength_x_px": 2248.0311669360754,
+    "focallength_y_px": 2248.0311669360754,
+    "center_x_px": 1920.0,
+    "center_y_px": 1080.0,
+    "image_height_px": 2160,
+    "image_width_px": 3840,
+    "sensor_height_mm": 13.0,
+    "sensor_width_mm": 17.3,
+    "elevation_m": 8.34876788841317,
+    "tilt_deg": 61.980319865806855,
+    "roll_deg": -0.22115695888484435,
+    "heading_deg": 255.32191451531128,
+    "pos_x_m": 0.0,
+    "pos_y_m": 0.0,
+    "k1": -0.20641418259538744,
+    "k2": -0.05195414810255018,
+    "k3": 0.0,
+    "projection": 0,
+    "lens": 2
+}

@@ -1,0 +1,23 @@
+reid_config:
+  reid_config_path: '/code/model_config.yaml'
+  reid_weight: '/code/sbs_model.pth'
+  reid_device: 'cuda'  # or 'cpu' or dla0
+
+tracklet_database:
+  searching_time: 3000
+  lost_time: 3000
+
+max_queue_size: 64
+sampling_rate: 5
+last_frame_id: 8999
+
+frame_info: False # to define if the frame info should be included in the output message
+log_level: INFO
+redis:
+  host: redis
+  port: 6379
+  stream_id: stream6
+  input_stream_prefix: geomapper
+  output_stream_prefix: featureextractor
+
+prometheus_port: 8000

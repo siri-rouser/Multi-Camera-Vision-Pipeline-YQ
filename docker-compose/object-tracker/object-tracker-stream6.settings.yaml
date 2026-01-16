@@ -1,0 +1,12 @@
+tracker_algorithm: bytetrack
+tracker_algorithm_config_path: '/code/tracking_config/bytetrack.yaml'
+track_reid: False
+track_reid_weights: /code/clip_vehicleid.pt  # Path to the reid weights file
+log_level: DEBUG
+
+redis:
+  host: redis # Updated to point to localhost
+  port: 6379
+  stream_id: stream6
+  input_stream_prefix: objectdetector
+  output_stream_prefix: objecttracker

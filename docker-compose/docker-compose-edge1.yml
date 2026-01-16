@@ -29,7 +29,7 @@ services:
       - VIDEO_SOURCE_PARALLELISM=2
     volumes:
       - ./video-source-py/video-source-stream1.settings.yaml:/code/settings.yaml
-      - /home/yuqiang/yl4300/Multi-Camera-Vision-Pipeline-YQ/carmel_data/cam01_2k_15fps.mp4:/code/cam01_2k_15fps.mp4
+      - /home/yuqiang/yl4300/Multi-Camera-Vision-Pipeline-YQ/cityflow_data/S06/c041/vdo.avi:/code/c041.avi
     depends_on:
       redis:
         condition: service_healthy

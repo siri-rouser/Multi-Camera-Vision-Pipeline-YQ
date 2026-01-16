@@ -6,3 +6,4 @@ subpackages/TensorRT
 *.pth
 *.onnx
 *.weights
+cityflow_data/
