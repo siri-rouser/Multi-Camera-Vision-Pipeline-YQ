@@ -160,6 +160,7 @@ if __name__ == '__main__':
 
                 if stream_key is None or proto_data is None:
                     continue
+                    
                 if not started:
                     started = True
                     start_time = time.time()

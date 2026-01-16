@@ -26,7 +26,7 @@ python3 ../tools/sae-introspection/record_thread.py \
   --streams "featureextractor:stream${X}" \
   --time-limit "$TIME_LIMIT" &
 
-python3 ../tools/sae-introspection/record.py \
-  --streams "geomapper:stream${X}" \
-  --record-video \
-  --time-limit "$TIME_LIMIT" &
+# python3 ../tools/sae-introspection/record.py \
+#   --streams "geomapper:stream${X}" \
+#   --record-video \
+#   --time-limit "$TIME_LIMIT" &
