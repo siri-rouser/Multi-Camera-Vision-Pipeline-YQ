@@ -1,6 +1,6 @@
 min_conf:
   type: uniform
-  default: 0.3  # from the default parameters
+  default: 0.25  # from the default parameters
   range: [0.1, 0.3]
 
 track_thresh:
@@ -15,10 +15,10 @@ track_buffer:
 
 match_thresh:
   type: uniform
-  default: 0.8  # from the default parameters
+  default: 0.75  # from the default parameters
   range: [0.7, 0.9]
 
 frame_rate:
   type: choice
-  default: 15  # from the default parameters
-  choices: [15]  # static choice for Ray Search
+  default: 10  # from the default parameters
+  choices: [10]  # static choice for Ray Search

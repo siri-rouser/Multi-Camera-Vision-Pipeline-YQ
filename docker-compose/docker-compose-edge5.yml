@@ -24,25 +24,25 @@ services:
   #     - 8554:8554
 
   video-source-stream5:
-    image: mcvt_yq/video_source_py_arm64:eval
+    image: sirirouser/video_source_py_arm64:cityflow 
     environment:
       - VIDEO_SOURCE_PARALLELISM=2
     volumes:
       - ./video-source-py/video-source-stream5.settings.yaml:/code/settings.yaml
-      - /home/yuqiang/yl4300/Multi-Camera-Vision-Pipeline-YQ/carmel_data/cam05_2k_15fps.mp4:/code/cam05_2k_15fps.mp4
+      - /home/yuqiang/yl4300/Multi-Camera-Vision-Pipeline-YQ/cityflow_data/S06/c045/vdo.avi:/code/c045.avi
     depends_on:
       redis:
         condition: service_healthy
 
   object-detector5:
-    image: sirirouser/object_detector_arm64:latest
+    image: sirirouser/object_detector_arm64:cityflow
     environment:
       - NVIDIA_VISIBLE_DEVICES=all    
       - NVIDIA_DRIVER_CAPABILITIES=compute,utility
     runtime: nvidia  # Ensure NVIDIA runtime is used
     volumes:
       - ./object-detector/object-detector5.settings.yaml:/code/settings.yaml  # Config file
-      - /home/yuqiang/yl4300/Multi-Camera-Vision-Pipeline-YQ/subpackages/object-detector-YQ/object-detector-YQ/batch2_b20_imgsz1120_0817.engine:/code/retrained_yolo11n.engine
+      - /home/yuqiang/yl4300/Multi-Camera-Vision-Pipeline-YQ/subpackages/object-detector-YQ/object-detector-YQ/yolo11l.engine:/code/yolo11l.engine
     depends_on:
       redis:
         condition: service_healthy
@@ -57,17 +57,8 @@ services:
       redis:
         condition: service_healthy
 
-  geo-mapper5:
-    image: sirirouser/geomapper_arm64:latest
-    volumes:
-      - ./geo-mapper/geo-mapper5.settings.yaml:/code/settings.yaml
-      - ./geo-mapper/cam_config/cam05_fitted_cam.json:/code/cam05.json
-    depends_on:
-      redis:
-        condition: service_healthy
-  
   feature_extractor5:
-    image: sirirouser/feature_extractor_arm64:thread
+    image: sirirouser/feature_extractor_arm64:cityflow
     environment:
       - NVIDIA_VISIBLE_DEVICES=all    
       - NVIDIA_DRIVER_CAPABILITIES=compute,utility

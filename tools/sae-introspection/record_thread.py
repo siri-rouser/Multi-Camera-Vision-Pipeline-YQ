@@ -111,7 +111,7 @@ if __name__ == '__main__':
     saedump_dir = '/home/yuqiang/yl4300/Multi-Camera-Vision-Pipeline-YQ/tools/sae-introspection/record_saedump'
     os.makedirs(saedump_dir, exist_ok=True)
 
-    output_file = os.path.join(saedump_dir, f'{STREAM_KEYS[0]}.saedump')
+    output_file = os.path.join(saedump_dir, f'cityflow_{STREAM_KEYS[0]}.saedump')
 
     print(f"Will record stream(s): {STREAM_KEYS}")
     print(f"Output: {output_file}")

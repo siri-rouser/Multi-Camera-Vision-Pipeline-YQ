@@ -1,6 +1,6 @@
 id: stream3
-video_path: /code/cam03_2k_15fps.mp4
-max_fps: 15
+video_path: /code/c043.avi
+max_fps: 10
 stop_after_frames: 9000
 jpeg_encode: True
 log_level: DEBUG

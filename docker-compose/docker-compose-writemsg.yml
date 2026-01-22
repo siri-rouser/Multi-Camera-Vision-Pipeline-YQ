@@ -16,7 +16,7 @@ services:
     image: sirirouser/local_sae_writer_arm64:latest
     volumes:
       - ./local-sae-writer/local-sae-writer1.settings.yaml:/code/settings.yaml
-      - ./local-sae-writer/saedumps/cam01_new.saedump:/code/cam01.saedump
+      - ./local-sae-writer/saedumps/cityflow_cam041_new.saedump:/code/cityflow_cam041.saedump
     depends_on:
       redis:
         condition: service_healthy
@@ -25,7 +25,7 @@ services:
     image: sirirouser/local_sae_writer_arm64:latest
     volumes:
       - ./local-sae-writer/local-sae-writer2.settings.yaml:/code/settings.yaml
-      - ./local-sae-writer/saedumps/cam02_new.saedump:/code/cam02.saedump
+      - ./local-sae-writer/saedumps/cityflow_cam042_new.saedump:/code/cityflow_cam042.saedump
     depends_on:
       redis:
         condition: service_healthy
@@ -34,8 +34,7 @@ services:
     image: sirirouser/local_sae_writer_arm64:latest
     volumes:
       - ./local-sae-writer/local-sae-writer3.settings.yaml:/code/settings.yaml
-      - ./local-sae-writer/saedumps/cam03_new.saedump:/code/cam03.saedump
-      # - /home/yuqiang/yl4300/Multi-Camera-Vision-Pipeline-YQ/tools/sae-introspection/record_saedump/featureextractor_stream3.saedump:/code/cam03_sample.saedump
+      - ./local-sae-writer/saedumps/cityflow_cam043_new.saedump:/code/cityflow_cam043.saedump
     depends_on:
       redis:
         condition: service_healthy
@@ -44,8 +43,25 @@ services:
     image: sirirouser/local_sae_writer_arm64:latest
     volumes:
       - ./local-sae-writer/local-sae-writer4.settings.yaml:/code/settings.yaml
-      - ./local-sae-writer/saedumps/cam04_new.saedump:/code/cam04.saedump
-      # - /home/yuqiang/yl4300/Multi-Camera-Vision-Pipeline-YQ/tools/sae-introspection/record_saedump/featureextractor_stream4.saedump:/code/cam04_sample.saedump
+      - ./local-sae-writer/saedumps/cityflow_cam044_new.saedump:/code/cityflow_cam044.saedump
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  local-sae-writer5:
+    image: sirirouser/local_sae_writer_arm64:latest
+    volumes:
+      - ./local-sae-writer/local-sae-writer5.settings.yaml:/code/settings.yaml
+      - ./local-sae-writer/saedumps/cityflow_cam045_new.saedump:/code/cityflow_cam045.saedump
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  local-sae-writer6:
+    image: sirirouser/local_sae_writer_arm64:latest
+    volumes:
+      - ./local-sae-writer/local-sae-writer6.settings.yaml:/code/settings.yaml
+      - ./local-sae-writer/saedumps/cityflow_cam046_new.saedump:/code/cityflow_cam046.saedump
     depends_on:
       redis:
         condition: service_healthy

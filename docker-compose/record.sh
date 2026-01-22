@@ -7,9 +7,9 @@ X="${1:-1}"            # 1..4
 TIME_LIMIT="${2:-650}" # seconds
 FILE="docker-compose-edge${X}.yml"
 
-if [[ ! "$X" =~ ^[1-4]$ ]]; then
+if [[ ! "$X" =~ ^[1-6]$ ]]; then
   echo "Usage: $0 X [TIME_LIMIT]"
-  echo "  X: 1|2|3|4 (stream index)"
+  echo "  X: 1|2|3|4|5|6 (stream index)"
   exit 1
 fi
 

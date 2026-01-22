@@ -5,8 +5,8 @@ set -euo pipefail
 
 X="${1:-1}"  # choose 1|2|3|4 at run time, default 1
 
-if [[ ! "$X" =~ ^[1-4]$ ]]; then
-  echo "Usage: $0 [1|2|3|4]"
+if [[ ! "$X" =~ ^[1-6]$ ]]; then
+  echo "Usage: $0 [1|2|3|4|5|6]"
   exit 1
 fi
 
@@ -16,7 +16,7 @@ FILE="docker-compose-edge${X}.yml"
 COMPOSE="docker compose -f ${FILE}"
 
 # Services are assumed to be named exactly like below:
-CORE_SERVICES=(redis "object-detector${X}" "object-tracker-stream${X}" "geo-mapper${X}" "feature_extractor${X}")
+CORE_SERVICES=(redis "object-detector${X}" "object-tracker-stream${X}" "feature_extractor${X}")
 VIDEO_SERVICE="video-source-stream${X}"
 
 echo "Starting core services for x=${X}: ${CORE_SERVICES[*]}"
