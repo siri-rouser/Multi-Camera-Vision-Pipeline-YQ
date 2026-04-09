@@ -109,7 +109,6 @@ services:
       redis:
         condition: service_healthy
 
-  
   object-tracker-stream2:
     image: sirirouser/object_tracker:v4.3
     volumes:

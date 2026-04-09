@@ -44,8 +44,8 @@ def handle_sae_message(sae_message_bytes, stream_key):
         print(f'The start frame is {tracklet.start_time}, the end frame is {tracklet.end_time}, the duration is {tracklet.end_time - tracklet.start_time}')
         print(f'shape of mean_feature is ({len(tracklet.mean_feature)},)')
         print(f'len of detection: {len(tracklet.detections_info)}')
-        for detection in tracklet.detections_info:
-            print(f'tracklet {detection.object_id} with frame id {detection.frame_id}')
+        # for detection in tracklet.detections_info:
+        #     print(f'tracklet {detection.object_id} with frame id {detection.frame_id}')
 
     # frametime = sae_msg.frame.timestamp_utc_ms - previous_frame_timestamp
     # previous_frame_timestamp = sae_msg.frame.timestamp_utc_ms
